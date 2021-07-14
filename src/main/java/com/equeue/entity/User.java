@@ -1,0 +1,107 @@
+package com.equeue.entity;
+
+import com.equeue.service.HelperService;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+public class User {
+
+    private Long id;
+    private String name;
+    private String role;
+    private Long telegramId;
+    private List<Provider> providers = new ArrayList<>();
+    private List<Session> sessions = new ArrayList<>();
+
+    public User() {
+    }
+
+    public Long getId() {
+        return this.id;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public String getRole() {
+        return this.role;
+    }
+
+    public Long getTelegramId() {
+        return this.telegramId;
+    }
+
+    public List<Provider> getProviders() {
+        return providers;
+    }
+
+    public List<Session> getSessions() {
+        return sessions;
+    }
+
+    public User setId(Long id) {
+        this.id = id;
+        return this;
+    }
+
+    public User setName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public User setRole(String role) {
+        this.role = role;
+        return this;
+    }
+
+    public User setTelegramId(Long telegramId) {
+        this.telegramId = telegramId;
+        return this;
+    }
+
+    public User setProviders(List<Provider> providers) {
+        this.providers = providers;
+        return this;
+    }
+
+    public User setSessions(List<Session> sessions) {
+        this.sessions = sessions;
+        return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id) && Objects.equals(name, user.name) && Objects.equals(role, user.role) && Objects.equals(telegramId, user.telegramId) && Objects.equals(providers, user.providers) && Objects.equals(sessions, user.sessions);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, role, telegramId, providers, sessions);
+    }
+
+    @Override
+    public String toString() {
+        return "User{" + "\n" +
+                "id=" + id + ", \n" +
+                "name='" + name + "', \n" +
+                "role='" + role + "', \n" +
+                "telegramId=" + telegramId + ", \n" +
+                "providers=" +
+                (providers == null || providers.size() == 0 ? "none" : providers.stream()
+                        .map(p -> '\'' + p.getName() + "' (" + p.getId() + ")")
+                        .collect(Collectors.joining(", "))) + ", \n" +
+                "sessions=" +
+                (sessions == null || sessions.size() == 0 ? "none" : sessions.stream()
+                        .map(s -> s.getProvider().getId() + ": " + HelperService.dateOf(s.getSessionStart().getTime()))
+                        .collect(Collectors.joining(", "))) + "\n" +
+                '}';
+    }
+
+}
