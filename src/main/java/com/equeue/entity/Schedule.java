@@ -1,6 +1,9 @@
 package com.equeue.entity;
 
+import com.equeue.service.HelperService;
+
 import java.sql.Timestamp;
+import java.time.DayOfWeek;
 import java.util.Objects;
 
 public class Schedule {
@@ -74,13 +77,13 @@ public class Schedule {
 
     @Override
     public String toString() {
-        return "Schedule{" +
-                "provider=" + provider +
-                ", dayOfWeek=" + dayOfWeek +
-                ", workStart=" + workStart +
-                ", workFinish=" + workFinish +
-                ", duration=" + duration +
-                '}';
+        return "Schedule {" + " \n" +
+                "provider=" + provider.getName() + "' (" + provider.getId() + ")" + ", \n" +
+                "dayOfWeek=" + DayOfWeek.of(dayOfWeek) + ", \n" +
+                "workStart=" + HelperService.timeOf(workStart) + ", \n" +
+                "workFinish=" + HelperService.timeOf(workFinish) + ", \n" +
+                "duration=" + duration +
+                " }";
     }
 
 }

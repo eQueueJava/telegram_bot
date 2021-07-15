@@ -1,5 +1,7 @@
 package com.equeue.entity;
 
+import com.equeue.service.HelperService;
+
 import java.sql.Timestamp;
 import java.util.Objects;
 
@@ -74,13 +76,13 @@ public class Session {
 
     @Override
     public String toString() {
-        return "Session{" +
-                "id=" + id +
-                ", provider=" + provider +
-                ", customer=" + customer +
-                ", sessionStart=" + sessionStart +
-                ", sessionFinish=" + sessionFinish +
-                '}';
+        return "Session { " +
+                "id=" + id + ", \n" +
+                "provider=" + provider.getName() + "' (" + provider.getId() + ")" + ", \n" +
+                "customer=" + customer.getName() + "' (" + customer.getId() + ")" + ", \n" +
+                "sessionStart=" + HelperService.timeOf(sessionStart) + ", \n" +
+                "sessionFinish=" + HelperService.timeOf(sessionFinish) +
+                " }";
     }
 
 }

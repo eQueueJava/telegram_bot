@@ -88,20 +88,20 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" + "\n" +
+        return "User { " +
                 "id=" + id + ", \n" +
                 "name='" + name + "', \n" +
                 "role='" + role + "', \n" +
                 "telegramId=" + telegramId + ", \n" +
-                "providers=" +
+                "providers=" + "\n\t" +
                 (providers == null || providers.size() == 0 ? "none" : providers.stream()
-                        .map(p -> '\'' + p.getName() + "' (" + p.getId() + ")")
-                        .collect(Collectors.joining(", "))) + ", \n" +
-                "sessions=" +
+                        .map(p -> "'" + p.getName() + "' (" + p.getId() + ")")
+                        .collect(Collectors.joining(", \n\t"))) + ", \n" +
+                "sessions=" + "\n\t" +
                 (sessions == null || sessions.size() == 0 ? "none" : sessions.stream()
                         .map(s -> s.getProvider().getId() + ": " + HelperService.dateOf(s.getSessionStart().getTime()))
-                        .collect(Collectors.joining(", "))) + "\n" +
-                '}';
+                        .collect(Collectors.joining(", \n\t"))) +
+                " }";
     }
 
 }
