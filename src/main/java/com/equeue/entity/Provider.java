@@ -1,12 +1,15 @@
 package com.equeue.entity;
 
+import java.util.Map;
 import java.util.Objects;
+import java.util.TreeMap;
 
 public class Provider {
 
     private Long id;
     private User client;
     private String name;
+    private Map<Integer, Schedule> scheduleMap = new TreeMap<>();
 
     public Provider() {
     }
@@ -23,6 +26,10 @@ public class Provider {
         return name;
     }
 
+    public Map<Integer, Schedule> getScheduleMap() {
+        return scheduleMap;
+    }
+
     public Provider setId(Long id) {
         this.id = id;
         return this;
@@ -35,6 +42,11 @@ public class Provider {
 
     public Provider setName(String name) {
         this.name = name;
+        return this;
+    }
+
+    public Provider setScheduleMap(Map<Integer, Schedule> scheduleMap) {
+        this.scheduleMap = scheduleMap;
         return this;
     }
 
