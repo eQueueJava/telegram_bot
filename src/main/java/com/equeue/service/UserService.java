@@ -36,12 +36,25 @@ public class UserService {
         }
 
         String[] lines = messageText.split("\n");
-        User client = new User()
-                .setName(lines[1].replace("name:", "").trim())
-                .setRole("CLIENT")
-                .setTelegramId(message.getFrom().getId());
-        save(client);
-        return client.toString();
+        String name = lines[1].replace("name:", "").trim();
+
+        if(!checkName(name)){
+            return "Не правильно введено имья!";
+        }
+
+        if(findByName(name).getId() == null) {
+            User client = new User()
+                    .setName(name)
+                    .setRole("CLIENT")
+                    .setTelegramId(message.getFrom().getId());
+            save(client);
+            return client.toString();
+        }
+        return "Пользователь c таким именем уже зарегистрировался!";
+    }
+
+    private boolean checkName(String name) {
+        return name.matches("^[a-zA-Z0-9- ]+$");
     }
 
     public String findById(Message message) {
@@ -56,4 +69,7 @@ public class UserService {
         return userRepository.findById(Long.valueOf(lines[1].replace("clientId:", "").trim())).toString();
     }
 
+    private User findByName(String name){
+        return userRepository.findByName(name);
+    }
 }

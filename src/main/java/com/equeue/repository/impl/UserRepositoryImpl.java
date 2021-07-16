@@ -3,6 +3,7 @@ package com.equeue.repository.impl;
 import com.equeue.entity.User;
 import org.springframework.stereotype.Repository;
 import com.equeue.repository.UserRepository;
+import org.springframework.validation.BindingResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,7 +13,7 @@ import java.util.Map;
 @Repository
 public class UserRepositoryImpl implements UserRepository {
 
-    Map<Long, User> userMap = new HashMap<>();
+    private static final Map<Long, User> USER_MAP = new HashMap<>();
     Long id = 1L;
 
     @Override
@@ -20,18 +21,27 @@ public class UserRepositoryImpl implements UserRepository {
         if (user.getId() == null) {
             user.setId(id++);
         }
-        userMap.put(user.getId(), user);
-        return userMap.get(user.getId());
+        USER_MAP.put(user.getId(), user);
+        return USER_MAP.get(user.getId());
     }
 
     @Override
     public List<User> findAll() {
-        return new ArrayList<>(userMap.values());
+        return new ArrayList<>(USER_MAP.values());
     }
 
     @Override
     public User findById(Long id) {
-        return userMap.get(id);
+        return USER_MAP.get(id);
     }
 
+    @Override
+    public User findByName(String name) {
+        for (Map.Entry<Long, User> entry: USER_MAP.entrySet()) {
+            if(entry.getValue().getName().equals(name)){
+                return entry.getValue();
+            }
+        }
+        return new User();
+    }
 }
