@@ -95,12 +95,14 @@ public class User {
                 "role='" + role + "', \n" +
                 "telegramId=" + telegramId + ", \n" +
                 "providers=" + "\n\t" +
-                (providers == null || providers.size() == 0 ? "none" : providers.stream()
+                (providers == null || providers.isEmpty() ? "none" : providers.stream()
                         .map(p -> "'" + p.getName() + "' (" + p.getId() + ")")
                         .collect(Collectors.joining(", \n\t"))) + ", \n" +
                 "sessions=" + "\n\t" +
-                (sessions == null || sessions.size() == 0 ? "none" : sessions.stream()
-                        .map(s -> s.getProvider().getId() + ": " + HelperService.dateOf(s.getSessionStart().getTime()))
+                (sessions == null || sessions.isEmpty() ? "none" : sessions.stream()
+                        .map(s -> s.getProvider().getId() + ": " +
+                                HelperService.dateOf(s.getSessionStart().getTime()) + " " +
+                                HelperService.timeOf(s.getSessionStart().getTime()))
                         .collect(Collectors.joining(", \n\t"))) +
                 " }";
     }
