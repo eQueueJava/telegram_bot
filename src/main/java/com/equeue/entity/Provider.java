@@ -67,17 +67,27 @@ public class Provider {
         return Objects.hash(id, client, name);
     }
 
+//    @Override
+//    public String toString() {
+//        return "Provider { " +
+//                "id=" + id + ", \n" +
+//                "name='" + name + "'" + ", \n" +
+//                "client='" + client.getName() + "' (" + client.getId() + ")" + ", \n" +
+//                "schedules=" + " \n\t" +
+//                (scheduleMap == null || scheduleMap.size() == 0 ? "none" : scheduleMap.values().stream()
+//                        .map(s -> DayOfWeek.of(s.getDayOfWeek()) + ":\t" + HelperService.timeOf(s.getWorkStart()) + "-" + HelperService.timeOf(s.getWorkFinish()) + " (" + s.getDuration() + "min)")
+//                        .collect(Collectors.joining(", \n\t"))) +
+//                " }";
+//    }
+
     @Override
     public String toString() {
-        return "Provider { " +
-                "id=" + id + ", \n" +
-                "name='" + name + "'" + ", \n" +
-                "client='" + client.getName() + "' (" + client.getId() + ")" + ", \n" +
-                "schedules=" + " \n\t" +
-                (scheduleMap == null || scheduleMap.size() == 0 ? "none" : scheduleMap.values().stream()
-                        .map(s -> DayOfWeek.of(s.getDayOfWeek()) + ":\t" + HelperService.timeOf(s.getWorkStart()) + "-" + HelperService.timeOf(s.getWorkFinish()) + " (" + s.getDuration() + "min)")
-                        .collect(Collectors.joining(", \n\t"))) +
-                " }";
+        return "Provider{" +
+                "id=" + id +
+                ", client=" + client +
+                ", name='" + name + '\'' +
+                ", scheduleMap=" + scheduleMap +
+                '}';
     }
 
 }

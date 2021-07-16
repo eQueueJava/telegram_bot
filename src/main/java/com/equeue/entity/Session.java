@@ -74,15 +74,26 @@ public class Session {
         return Objects.hash(id, provider, customer, sessionStart, sessionFinish);
     }
 
+//    @Override
+//    public String toString() {
+//        return "Session { " +
+//                "id=" + id + ", \n" +
+//                "provider=" + provider.getName() + "' (" + provider.getId() + ")" + ", \n" +
+//                "customer=" + customer.getName() + "' (" + customer.getId() + ")" + ", \n" +
+//                "sessionStart=" + HelperService.timeOf(sessionStart) + ", \n" +
+//                "sessionFinish=" + HelperService.timeOf(sessionFinish) +
+//                " }";
+//    }
+
     @Override
     public String toString() {
-        return "Session { " +
-                "id=" + id + ", \n" +
-                "provider=" + provider.getName() + "' (" + provider.getId() + ")" + ", \n" +
-                "customer=" + customer.getName() + "' (" + customer.getId() + ")" + ", \n" +
-                "sessionStart=" + HelperService.timeOf(sessionStart) + ", \n" +
-                "sessionFinish=" + HelperService.timeOf(sessionFinish) +
-                " }";
+        return "Session{" +
+                "id=" + id +
+                ", provider=" + provider +
+                ", customer=" + customer +
+                ", sessionStart=" + sessionStart +
+                ", sessionFinish=" + sessionFinish +
+                '}';
     }
 
 }
