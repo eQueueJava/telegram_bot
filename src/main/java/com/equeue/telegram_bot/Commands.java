@@ -4,20 +4,25 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public final class Commands {
-    public static final String CREATE_CLIENT = "/create_client";
+    private Commands() {}
+
+    public static final String CREATE_CLIENT = "/reg";
     public static final String CREATE_PROVIDER = "/create_provider";
     public static final String CREATE_SCHEDULE = "/create_schedule";
     public static final String READ_CLIENT = "/read_client";
     public static final String READ_PROVIDER = "/read_provider";
 
-    public static Map<String, String> commandMap = new LinkedHashMap<>();
+    private static final Map<String, String> COMMAND_MAP = new LinkedHashMap<>();
 
     static {
-        commandMap.put("ADD_CLIENT", CREATE_CLIENT);
-        commandMap.put("ADD_PROVIDER", CREATE_PROVIDER);
-        commandMap.put("ADD_SCHEDULE", CREATE_SCHEDULE);
-        commandMap.put("READ_CLIENT", READ_CLIENT);
-        commandMap.put("READ_PROVIDER", READ_PROVIDER);
+        COMMAND_MAP.put("ADD_CLIENT", CREATE_CLIENT);
+        COMMAND_MAP.put("ADD_PROVIDER", CREATE_PROVIDER);
+        COMMAND_MAP.put("ADD_SCHEDULE", CREATE_SCHEDULE);
+        COMMAND_MAP.put("READ_CLIENT", READ_CLIENT);
+        COMMAND_MAP.put("READ_PROVIDER", READ_PROVIDER);
     }
 
+    public static Map<String, String> getCommandMap() {
+        return COMMAND_MAP;
+    }
 }
