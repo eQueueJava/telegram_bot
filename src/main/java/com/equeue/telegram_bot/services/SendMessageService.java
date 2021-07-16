@@ -1,7 +1,5 @@
 package com.equeue.telegram_bot.services;
 
-
-import com.equeue.api.controller.RegistrationController;
 import com.equeue.service.ProviderService;
 import com.equeue.service.ScheduleService;
 import com.equeue.service.SessionService;
@@ -30,28 +28,12 @@ public class SendMessageService {
     }
 
     public void distribution(Message message) {
-        String messageText = message.getText();
-
-        String command;
-        if (messageText.indexOf(' ') > 0) {
-            if (messageText.indexOf('\n') > 0 && messageText.indexOf('\n') < messageText.indexOf(' ')) {
-                command = messageText.substring(0, messageText.indexOf('\n'));
-            } else {
-                command = messageText.substring(0, messageText.indexOf(' '));
-            }
-        } else if (messageText.indexOf('\n') > 0) {
-            command = messageText.substring(0, messageText.indexOf('\n'));
-        } else {
-            command = messageText;
-        }
+        String command = getCommand(message.getText());
 
         switch (command) {
             case "/":
             case "/start":
-                messageSender.sendMessage(getSendMessage(message, String.join("\n", Commands.commandMap.values())));
-                break;
-            case "/reg":
-                messageSender.sendMessage(userRegistration(message));
+                messageSender.sendMessage(getSendMessage(message, String.join("\n", Commands.getCommandMap().values())));
                 break;
             case Commands.CREATE_CLIENT:
                 messageSender.sendMessage(getSendMessage(message, userService.save(message)));
@@ -74,33 +56,32 @@ public class SendMessageService {
             case Commands.INPUT_TIME:
                 messageSender.sendMessage(getSendMessage(message, sessionService.selectSession(message)));
                 break;
-            case "/info":
-                messageSender.sendMessage(getInfo(message));
-                break;
             default:
                 messageSender.sendMessage(defaultMessage(message));
         }
     }
 
-    private SendMessage userRegistration(Message message) {
-        return getSendMessage(
-                message,
-                RegistrationController.createUser(message)
-        );
+    private String getCommand(String messageText) {
+        String command;
+        if (messageText.indexOf(' ') > 0) {
+            if (messageText.indexOf('\n') > 0 && messageText.indexOf('\n') < messageText.indexOf(' ')) {
+                command = messageText.substring(0, messageText.indexOf('\n'));
+            } else {
+                command = messageText.substring(0, messageText.indexOf(' '));
+            }
+        } else if (messageText.indexOf('\n') > 0) {
+            command = messageText.substring(0, messageText.indexOf('\n'));
+        } else {
+            command = messageText;
+        }
+        return command;
     }
 
-    private SendMessage getSendMessage(Message message, String test) {
+    private SendMessage getSendMessage(Message message, String text) {
         var sendMessage = new SendMessage();
         sendMessage.setChatId(String.valueOf(message.getChatId()));
-        sendMessage.setText(test);
+        sendMessage.setText(text);
         return sendMessage;
-    }
-
-    private SendMessage getInfo(Message message) {
-        return SendMessage.builder()
-                .text("Інформація")
-                .chatId(String.valueOf(message.getChatId()))
-                .build();
     }
 
     private SendMessage defaultMessage(Message message) {
