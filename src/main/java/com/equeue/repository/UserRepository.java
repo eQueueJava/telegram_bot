@@ -15,4 +15,6 @@ public interface UserRepository {
     User findById(Long id);
 
     User findByName(String name);
+
+    User findByTelegramId(Long id);
 }

@@ -44,4 +44,14 @@ public class UserRepositoryImpl implements UserRepository {
         }
         return new User();
     }
+
+    @Override
+    public User findByTelegramId(Long id) {
+        for (Map.Entry<Long, User> entry: USER_MAP.entrySet()) {
+            if(entry.getValue().getTelegramId().equals(id)){
+                return entry.getValue();
+            }
+        }
+        return new User();
+    }
 }
