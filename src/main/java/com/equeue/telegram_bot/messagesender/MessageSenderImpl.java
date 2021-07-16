@@ -8,12 +8,9 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Service
 public class MessageSenderImpl implements MessageSender {
-private EQueueBot eQueueBot;
 
     @Autowired
-    public void setEQueueBot(EQueueBot eQueueBot) {
-        this.eQueueBot = eQueueBot;
-    }
+    private EQueueBot eQueueBot;
 
     @Override
     public void sendMessage(SendMessage sendMessage) {
