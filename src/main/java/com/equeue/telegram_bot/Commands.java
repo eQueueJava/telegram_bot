@@ -9,6 +9,8 @@ public final class Commands {
     public static final String CREATE_SCHEDULE = "/create_schedule";
     public static final String READ_CLIENT = "/read_client";
     public static final String READ_PROVIDER = "/read_provider";
+    public static final String GET_FREE_TIME = "/get_free_time";
+    public static final String INPUT_TIME = "/input_time";
 
     public static Map<String, String> commandMap = new LinkedHashMap<>();
 
@@ -18,6 +20,7 @@ public final class Commands {
         commandMap.put("ADD_SCHEDULE", CREATE_SCHEDULE);
         commandMap.put("READ_CLIENT", READ_CLIENT);
         commandMap.put("READ_PROVIDER", READ_PROVIDER);
+        commandMap.put("GET_FREE_TIME", GET_FREE_TIME);
+        commandMap.put("INPUT_TIME", INPUT_TIME);
     }
-
 }

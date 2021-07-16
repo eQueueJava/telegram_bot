@@ -4,7 +4,8 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.util.Map;
 
-public class RegistrationChecker {
+public class
+RegistrationChecker {
     private RegistrationChecker() {}
 
     public static boolean isUser(Map<Long, String> USERS_CACHE , String userName) {

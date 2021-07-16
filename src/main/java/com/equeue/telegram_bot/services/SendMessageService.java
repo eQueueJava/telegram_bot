@@ -4,6 +4,7 @@ package com.equeue.telegram_bot.services;
 import com.equeue.api.controller.RegistrationController;
 import com.equeue.service.ProviderService;
 import com.equeue.service.ScheduleService;
+import com.equeue.service.SessionService;
 import com.equeue.service.UserService;
 import com.equeue.telegram_bot.Commands;
 import com.equeue.telegram_bot.messagesender.MessageSender;
@@ -18,12 +19,14 @@ public class SendMessageService {
     private final ScheduleService scheduleService;
     private final ProviderService providerService;
     private final UserService userService;
+    private final SessionService sessionService;
 
-    public SendMessageService(MessageSender messageSender, ScheduleService scheduleService, ProviderService providerService, UserService userService) {
+    public SendMessageService(MessageSender messageSender, ScheduleService scheduleService, ProviderService providerService, UserService userService, SessionService sessionService) {
         this.messageSender = messageSender;
         this.scheduleService = scheduleService;
         this.providerService = providerService;
         this.userService = userService;
+        this.sessionService = sessionService;
     }
 
     public void distribution(Message message) {
@@ -64,6 +67,12 @@ public class SendMessageService {
                 break;
             case Commands.READ_PROVIDER:
                 messageSender.sendMessage(getSendMessage(message, providerService.findById(message)));
+                break;
+            case Commands.GET_FREE_TIME:
+                messageSender.sendMessage(getSendMessage(message, sessionService.saveSession(message)));
+                break;
+            case Commands.INPUT_TIME:
+                messageSender.sendMessage(getSendMessage(message, sessionService.selectSession(message)));
                 break;
             case "/info":
                 messageSender.sendMessage(getInfo(message));

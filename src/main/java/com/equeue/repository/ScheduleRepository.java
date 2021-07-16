@@ -10,4 +10,12 @@ public interface ScheduleRepository {
 
     List<Schedule> findAll();
 
+    boolean hasProviderAnySchedules(Long providerId);
+
+    boolean hasProviderScheduleSpecificDay(Long providerId, String date);
+
+    Schedule getScheduleOfCurrentDay(Long providerId, String date);
+
+    List<String> generateTemplate(Schedule schedule);
+
 }

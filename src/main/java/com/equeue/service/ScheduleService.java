@@ -55,6 +55,4 @@ public class ScheduleService {
             return e.getMessage();//TODO
         }
     }
-
-
 }
