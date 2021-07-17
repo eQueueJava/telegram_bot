@@ -1,7 +1,7 @@
 package com.equeue.repository.impl;
 
 import com.equeue.entity.Session;
-import com.equeue.service.HelperService;
+import com.equeue.service.TimeUtil;
 import org.springframework.stereotype.Repository;
 import com.equeue.repository.SessionRepository;
 
@@ -55,7 +55,7 @@ public class SessionRepositoryImpl implements SessionRepository {
             for (Map.Entry<Long, Session> entry : sessionMap.entrySet()) {
                 Long key = entry.getKey();
                 Session session = sessionByProv.get(key);
-                String trim = HelperService.dateOf(session.getSessionStart()).trim();
+                String trim = TimeUtil.stringFromLocalDate(session.getSessionStart().toLocalDate()).trim();
                 if (date.equals(trim)){
                     res.put(key, session);
                 }

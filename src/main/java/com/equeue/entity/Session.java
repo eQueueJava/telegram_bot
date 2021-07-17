@@ -1,8 +1,8 @@
 package com.equeue.entity;
 
-import com.equeue.service.HelperService;
+import com.equeue.service.TimeUtil;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Session {
@@ -10,11 +10,8 @@ public class Session {
     private Long id;
     private Provider provider;
     private User customer;
-    private Timestamp sessionStart;
-    private Timestamp sessionFinish;
-
-    public Session() {
-    }
+    private LocalDateTime sessionStart;
+    private LocalDateTime sessionFinish;
 
     public Long getId() {
         return id;
@@ -28,11 +25,11 @@ public class Session {
         return customer;
     }
 
-    public Timestamp getSessionStart() {
+    public LocalDateTime getSessionStart() {
         return sessionStart;
     }
 
-    public Timestamp getSessionFinish() {
+    public LocalDateTime getSessionFinish() {
         return sessionFinish;
     }
 
@@ -51,12 +48,12 @@ public class Session {
         return this;
     }
 
-    public Session setSessionStart(Timestamp sessionStart) {
+    public Session setSessionStart(LocalDateTime sessionStart) {
         this.sessionStart = sessionStart;
         return this;
     }
 
-    public Session setSessionFinish(Timestamp sessionFinish) {
+    public Session setSessionFinish(LocalDateTime sessionFinish) {
         this.sessionFinish = sessionFinish;
         return this;
     }
@@ -80,8 +77,8 @@ public class Session {
                 "id=" + id + ", \n" +
                 "provider=" + provider.getName() + "' (" + provider.getId() + ")" + ", \n" +
                 "customer=" + (customer == null ? "none" : (customer.getName() + "' (" + customer.getId() + ")")) + ", \n" +
-                "sessionStart=" + HelperService.timeOf(sessionStart) + ", \n" +
-                "sessionFinish=" + HelperService.timeOf(sessionFinish) +
+                "sessionStart=" + TimeUtil.stringFromLocalDateTime(sessionStart) + ", \n" +
+                "sessionFinish=" + TimeUtil.stringFromLocalDateTime(sessionFinish) +
                 " }";
     }
 

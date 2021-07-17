@@ -4,6 +4,7 @@ import com.equeue.entity.Schedule;
 import com.equeue.repository.ProviderRepository;
 import com.equeue.repository.ScheduleRepository;
 import com.equeue.service.HelperService;
+import com.equeue.service.TimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -42,7 +43,7 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
     public boolean hasProviderScheduleSpecificDay(Long providerId, String date) {
         int deyFromDate = 0;
         try {
-            deyFromDate = HelperService.getDeyFromDate(date);
+            deyFromDate = TimeUtil.getDayFromDate(date);
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -54,7 +55,7 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
     public Schedule getScheduleOfCurrentDay(Long providerId, String date){
         int deyFromDate = 0;
         try {
-            deyFromDate = HelperService.getDeyFromDate(date);
+            deyFromDate = TimeUtil.getDayFromDate(date);
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -63,11 +64,11 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
     }
 
     public List<String> generateTemplate(Schedule schedule) {
-        String startTime = HelperService.timeOf(schedule.getWorkStart());
-        String finishTime = HelperService.timeOf(schedule.getWorkFinish());
+        String startTime = TimeUtil.stringFromLocalTime(schedule.getWorkStart());
+        String finishTime = TimeUtil.stringFromLocalTime(schedule.getWorkFinish());
         double duration = schedule.getDuration() / 60.0;
-        double start = HelperService.changeStrTimeToDouble(startTime);
-        double finish = HelperService.changeStrTimeToDouble(finishTime);
+        double start = TimeUtil.changeStrTimeToDouble(startTime);
+        double finish = TimeUtil.changeStrTimeToDouble(finishTime);
 
         List<String> list = new ArrayList<>();
         list.add(start + "0");

@@ -1,6 +1,6 @@
 package com.equeue.entity;
 
-import com.equeue.service.HelperService;
+import com.equeue.service.TimeUtil;
 
 import java.time.DayOfWeek;
 import java.util.Map;
@@ -14,9 +14,6 @@ public class Provider {
     private User client;
     private String name;
     private Map<Integer, Schedule> scheduleMap = new TreeMap<>();
-
-    public Provider() {
-    }
 
     public Long getId() {
         return id;
@@ -75,7 +72,7 @@ public class Provider {
                 "client='" + client.getName() + "' (" + client.getId() + ")" + ", \n" +
                 "schedules=" + " \n\t" +
                 (scheduleMap == null || scheduleMap.size() == 0 ? "none" : scheduleMap.values().stream()
-                        .map(s -> DayOfWeek.of(s.getDayOfWeek()) + ":\t" + HelperService.timeOf(s.getWorkStart()) + "-" + HelperService.timeOf(s.getWorkFinish()) + " (" + s.getDuration() + "min)")
+                        .map(s -> DayOfWeek.of(s.getDayOfWeek()) + ":\t" + TimeUtil.stringFromLocalTime(s.getWorkStart()) + "-" + TimeUtil.stringFromLocalTime(s.getWorkFinish()) + " (" + s.getDuration() + "min)")
                         .collect(Collectors.joining(", \n\t"))) +
                 " }";
     }
