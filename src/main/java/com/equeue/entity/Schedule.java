@@ -1,21 +1,18 @@
 package com.equeue.entity;
 
-import com.equeue.service.HelperService;
+import com.equeue.service.TimeUtil;
 
-import java.sql.Timestamp;
 import java.time.DayOfWeek;
+import java.time.LocalTime;
 import java.util.Objects;
 
 public class Schedule {
 
     private Provider provider;
     private Integer dayOfWeek;
-    private Timestamp workStart;
-    private Timestamp workFinish;
+    private LocalTime workStart;
+    private LocalTime workFinish;
     private Integer duration;
-
-    public Schedule() {
-    }
 
     public Provider getProvider() {
         return provider;
@@ -25,11 +22,11 @@ public class Schedule {
         return dayOfWeek;
     }
 
-    public Timestamp getWorkStart() {
+    public LocalTime getWorkStart() {
         return workStart;
     }
 
-    public Timestamp getWorkFinish() {
+    public LocalTime getWorkFinish() {
         return workFinish;
     }
 
@@ -47,12 +44,12 @@ public class Schedule {
         return this;
     }
 
-    public Schedule setWorkStart(Timestamp workStart) {
+    public Schedule setWorkStart(LocalTime workStart) {
         this.workStart = workStart;
         return this;
     }
 
-    public Schedule setWorkFinish(Timestamp workFinish) {
+    public Schedule setWorkFinish(LocalTime workFinish) {
         this.workFinish = workFinish;
         return this;
     }
@@ -80,8 +77,8 @@ public class Schedule {
         return "Schedule {" + " \n" +
                 "provider=" + provider.getName() + "' (" + provider.getId() + ")" + ", \n" +
                 "dayOfWeek=" + DayOfWeek.of(dayOfWeek) + ", \n" +
-                "workStart=" + HelperService.timeOf(workStart) + ", \n" +
-                "workFinish=" + HelperService.timeOf(workFinish) + ", \n" +
+                "workStart=" + TimeUtil.stringFromLocalTime(workStart) + ", \n" +
+                "workFinish=" + TimeUtil.stringFromLocalTime(workFinish) + ", \n" +
                 "duration=" + duration +
                 " }";
     }

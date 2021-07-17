@@ -74,7 +74,7 @@ public class SessionService {
         for (Map.Entry<Long, Session> entry : sessionByProviderOfDate.entrySet()) {
             Long sessionId = entry.getKey();
             Session session = sessionByProviderOfDate.get(sessionId);
-            if (HelperService.timeOf(session.getSessionStart().getTime()).equals(time)) {
+            if (TimeUtil.stringFromLocalTime(session.getSessionStart().toLocalTime()).equals(time)) {
                 User customer = session.getCustomer();
                 if (customer == null) {
                     User user = userRepository.findById(userId);
@@ -127,7 +127,7 @@ public class SessionService {
             Long sessionId = entry.getKey();
             Session session = sessionByProviderOfDate.get(sessionId);
             if (session.getCustomer() == null) {
-                res.append(HelperService.timeOf(session.getSessionStart())).append('\n');
+                res.append(TimeUtil.stringFromLocalTime(session.getSessionStart().toLocalTime())).append('\n');
             }
         }
         return res.toString();
@@ -138,8 +138,8 @@ public class SessionService {
             final Session session = new Session();
             session.setProvider(providerRepository.findById(providerId));
             session.setCustomer(null);
-            session.setSessionStart(HelperService.stringToTimestamp(line.trim() + " " + list.get(i - 1).trim()));
-            session.setSessionFinish(HelperService.stringToTimestamp(line.trim() + " " + list.get(i)));
+            session.setSessionStart(TimeUtil.localDateTimeFromString(line.trim() + " " + list.get(i - 1).trim()));
+            session.setSessionFinish(TimeUtil.localDateTimeFromString(line.trim() + " " + list.get(i)));
             sessionRepository.save(session);
         }
     }

@@ -1,12 +1,11 @@
 package com.equeue.entity;
 
-import com.equeue.service.HelperService;
+import com.equeue.service.TimeUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
 
 public class User {
 
@@ -16,9 +15,6 @@ public class User {
     private Long telegramId;
     private List<Provider> providers = new ArrayList<>();
     private List<Session> sessions = new ArrayList<>();
-
-    public User() {
-    }
 
     public Long getId() {
         return this.id;
@@ -101,8 +97,8 @@ public class User {
                 "sessions=" + "\n\t" +
                 (sessions == null || sessions.isEmpty() ? "none" : sessions.stream()
                         .map(s -> s.getProvider().getId() + ": " +
-                                HelperService.dateOf(s.getSessionStart().getTime()) + " " +
-                                HelperService.timeOf(s.getSessionStart().getTime()))
+                                TimeUtil.stringFromLocalDateTime(s.getSessionStart())
+                        )
                         .collect(Collectors.joining(", \n\t"))) +
                 " }";
     }
