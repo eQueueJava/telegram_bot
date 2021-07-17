@@ -77,8 +77,8 @@ public class Schedule {
         return "Schedule {" + " \n" +
                 "provider=" + provider.getName() + "' (" + provider.getId() + ")" + ", \n" +
                 "dayOfWeek=" + DayOfWeek.of(dayOfWeek) + ", \n" +
-                "workStart=" + TimeUtil.stringFromLocalTime(workStart) + ", \n" +
-                "workFinish=" + TimeUtil.stringFromLocalTime(workFinish) + ", \n" +
+                "workStart=" + TimeUtil.stringFromLocalTime(TimeUtil.localTimeFromUtcTimeForZone(workStart, provider.getClient().getZoneId())) + ", \n" +
+                "workFinish=" + TimeUtil.stringFromLocalTime(TimeUtil.localTimeFromUtcTimeForZone(workFinish, provider.getClient().getZoneId())) + ", \n" +
                 "duration=" + duration +
                 " }";
     }
