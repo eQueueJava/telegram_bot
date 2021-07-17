@@ -41,26 +41,16 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
     }
 
     public boolean hasProviderScheduleSpecificDay(Long providerId, String date) {
-        int deyFromDate = 0;
-        try {
-            deyFromDate = TimeUtil.getDayFromDate(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        int dayFromDate = TimeUtil.localDateFromString(date).getDayOfWeek().getValue();
         Map<Integer, Schedule> integerScheduleMap = scheduleMap.get(providerId);
-        Schedule schedule = integerScheduleMap.get(deyFromDate);
+        Schedule schedule = integerScheduleMap.get(dayFromDate);
         return schedule != null;
     }
 
     public Schedule getScheduleOfCurrentDay(Long providerId, String date){
-        int deyFromDate = 0;
-        try {
-            deyFromDate = TimeUtil.getDayFromDate(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        int dayFromDate = TimeUtil.localDateFromString(date).getDayOfWeek().getValue();
         Map<Integer, Schedule> integerScheduleMap = scheduleMap.get(providerId);
-        return integerScheduleMap.get(deyFromDate);
+        return integerScheduleMap.get(dayFromDate);
     }
 
     public List<String> generateTemplate(Schedule schedule) {

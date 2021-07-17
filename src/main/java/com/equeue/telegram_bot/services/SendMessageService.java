@@ -6,6 +6,7 @@ import com.equeue.service.SessionService;
 import com.equeue.service.UserService;
 import com.equeue.telegram_bot.Commands;
 import com.equeue.telegram_bot.messagesender.MessageSender;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -13,19 +14,16 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 @Service
 public class SendMessageService {
 
-    private final MessageSender messageSender;
-    private final ScheduleService scheduleService;
-    private final ProviderService providerService;
-    private final UserService userService;
-    private final SessionService sessionService;
-
-    public SendMessageService(MessageSender messageSender, ScheduleService scheduleService, ProviderService providerService, UserService userService, SessionService sessionService) {
-        this.messageSender = messageSender;
-        this.scheduleService = scheduleService;
-        this.providerService = providerService;
-        this.userService = userService;
-        this.sessionService = sessionService;
-    }
+    @Autowired
+    private MessageSender messageSender;
+    @Autowired
+    private ScheduleService scheduleService;
+    @Autowired
+    private ProviderService providerService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private SessionService sessionService;
 
     public void distribution(Message message) {
         String command = getCommand(message.getText());
