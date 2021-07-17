@@ -3,9 +3,7 @@ package com.equeue.service;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
@@ -26,7 +24,7 @@ public class TimeUtil {
     }
 
     public static LocalDate localDateFromString(String stringDate) {
-        return LocalDate.parse(stringDate);
+        return LocalDate.parse(stringDate, DateTimeFormatter.ofPattern(DATE_PATTERN));
     }
 
     public static LocalDateTime localDateTimeFromString(String stringDateTime) {
@@ -43,6 +41,26 @@ public class TimeUtil {
 
     public static String stringFromLocalDateTime(LocalDateTime localDateTime) {
         return localDateTime.format(DateTimeFormatter.ofPattern(DATE_TIME_PATTERN));
+    }
+
+    public static LocalTime localTimeFromUtcTimeForZone(LocalTime localTime, ZoneId zoneId) {
+        return ZonedDateTime.of(localTime.atDate(LocalDate.EPOCH), ZoneId.of("UTC"))
+                .withZoneSameInstant(zoneId).toLocalTime();
+    }
+
+    static LocalTime utcTimeFromLocalTimeAndZone(LocalTime localTime, ZoneId zoneId) {
+        return ZonedDateTime.of(localTime.atDate(LocalDate.EPOCH), zoneId).
+                withZoneSameInstant(ZoneOffset.UTC).toLocalTime();
+    }
+
+    public static LocalDateTime localDateTimeFromUtcDateTimeForZone(LocalDateTime localDateTime, ZoneId zoneId) {
+        return ZonedDateTime.of(localDateTime, ZoneId.of("UTC"))
+                .withZoneSameInstant(zoneId).toLocalDateTime();
+    }
+
+    public static LocalDateTime utcDateTimeFromLocalDateTimeAndZone(LocalDateTime localDateTime, ZoneId zoneId) {
+        return ZonedDateTime.of(localDateTime, zoneId)
+                .withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
     }
 
     /*
