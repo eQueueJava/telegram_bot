@@ -7,12 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
-import java.time.ZoneId;
-import java.util.List;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
     public static final String ZONE_ID_KYIV = "Europe/Kiev";
+    public static final String PARAM_DIVIDER = "__";
 
     @Autowired
     UserRepository userRepository;
@@ -84,4 +87,49 @@ public class UserService {
         Long id = message.getChatId();
         return userRepository.findByTelegramId(id);
     }
+
+    public String setCurrentUserTimezone(Message message) {
+        String messageText = message.getText();
+        String[] params = getParams(messageText);
+        if (params.length == 0) {
+            List<LocalTime> allAvailableTime = TimeUtil.getAllAvailableTime();
+            return allAvailableTime.stream()
+                    .map(t -> t.format(DateTimeFormatter.ofPattern(TimeUtil.TIME_PATTERN)))
+                    .map(s -> Commands.SET_CURRENT_USER_TIMEZONE + PARAM_DIVIDER + s.replace(":","_"))
+                    .collect(Collectors.joining("\n"));
+        }
+        if (params[0].matches("\\d?\\d_\\d\\d")) {
+            String timeString = params[0].replace("_", ":");
+
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime userLocalDateTime = LocalDateTime.of(now.toLocalDate(),LocalTime.parse(timeString,DateTimeFormatter.ofPattern(TimeUtil.TIME_PATTERN)));
+            Set<ZoneId> zones = new HashSet<>();
+            for (String id : ZoneId.getAvailableZoneIds()) {
+                ZoneId zone = ZoneId.of(id);
+                ZoneOffset offset = zone.getRules().getOffset(now);
+                if (Math.abs(userLocalDateTime.toInstant(ZoneOffset.UTC).getEpochSecond() - Instant.now().getEpochSecond() - offset.getTotalSeconds()) < 600) {
+                    zones.add(zone);
+                }
+            }
+            return zones.stream()
+                    .map(ZoneId::toString)
+                    .sorted()
+                    .map(z-> Commands.SET_CURRENT_USER_TIMEZONE + PARAM_DIVIDER + z.replace("/","_"))
+                    .collect(Collectors.joining("\n"));
+        }
+        String zone = params[0].replace("_", "/");
+        try {
+            User byId = userRepository.findByTelegramId(message.getChatId());
+            byId.setZoneId(ZoneId.of(zone));
+        } catch (Exception e) {
+            return "FAIL";
+        }
+        return "OK";
+    }
+
+    private String[] getParams(String command) {
+        String[] strings = command.split("__");
+        return Arrays.copyOfRange(strings, 1, strings.length);
+    }
+
 }

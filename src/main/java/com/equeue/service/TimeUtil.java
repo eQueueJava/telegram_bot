@@ -5,9 +5,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class TimeUtil {
 
@@ -86,6 +85,19 @@ public class TimeUtil {
         String format = "0" + f.format(v);
         format = format.replace(',', '.');
         return Integer.parseInt(split[0]) + Double.parseDouble(format);
+    }
+
+    public static List<LocalTime> getAllAvailableTime() {
+        LocalDateTime now = LocalDateTime.now();
+        return ZoneId.getAvailableZoneIds()
+                .stream()
+                .map(zoneId -> ZoneId.of(zoneId).getRules().getOffset(now))
+                .distinct()
+                .sorted(Comparator.reverseOrder())
+                .map(offset -> ZonedDateTime.of(now, ZoneId.of("UTC"))
+                        .withZoneSameInstant(ZoneId.of(offset.toString()))
+                        .toLocalTime())
+                .collect(Collectors.toList());
     }
 
 }
