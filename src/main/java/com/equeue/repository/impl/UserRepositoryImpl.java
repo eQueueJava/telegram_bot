@@ -3,7 +3,6 @@ package com.equeue.repository.impl;
 import com.equeue.entity.User;
 import org.springframework.stereotype.Repository;
 import com.equeue.repository.UserRepository;
-import org.springframework.validation.BindingResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,6 +51,6 @@ public class UserRepositoryImpl implements UserRepository {
                 return entry.getValue();
             }
         }
-        return new User();
+        return null;
     }
 }

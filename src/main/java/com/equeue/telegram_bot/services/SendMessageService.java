@@ -26,12 +26,17 @@ public class SendMessageService {
     private SessionService sessionService;
 
     public void distribution(Message message) {
+        userService.registerGuestUserIfNotExist(message);
+
         String command = getCommand(message.getText());
 
         switch (command) {
             case "/":
             case "/start":
                 messageSender.sendMessage(getSendMessage(message, String.join("\n", Commands.getCommandMap().values())));
+                break;
+            case Commands.SHOW_CURRENT_USER_INFO:
+                messageSender.sendMessage(getSendMessage(message, userService.findByTelegramId(message).toString()));
                 break;
             case Commands.CREATE_CLIENT:
                 messageSender.sendMessage(getSendMessage(message, userService.save(message)));
@@ -88,4 +93,9 @@ public class SendMessageService {
                 .chatId(String.valueOf(message.getChatId()))
                 .build();
     }
+
+    public void sendTextTo(String messageTest, Long telegramId) {
+        messageSender.sendTextTo(messageTest, telegramId);
+    }
+
 }
