@@ -8,6 +8,7 @@ import com.equeue.repository.ScheduleRepository;
 import com.equeue.repository.SessionRepository;
 import com.equeue.repository.UserRepository;
 import com.equeue.telegram_bot.Commands;
+import com.equeue.telegram_bot.services.SendMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -26,6 +27,8 @@ public class SessionService {
     UserRepository userRepository;
     @Autowired
     ScheduleRepository scheduleRepository;
+    @Autowired
+    SendMessageService sendMessageService;
 
 
     public Session save(Session session) {
@@ -81,6 +84,11 @@ public class SessionService {
                     session.setCustomer(user);
                     List<Session> sessions = user.getSessions();
                     sessions.add(session);
+                    String messageForProvider = "New record: @" + session.getCustomer().getTelegramUsername() +
+                            "(t.me/" + session.getCustomer().getTelegramUsername() + ")" +
+                            "\nProvider: " + session.getProvider().getName() +
+                            "\nSession: " + TimeUtil.stringFromLocalDateTime(session.getSessionStart());
+                    sendMessageService.sendTextTo(messageForProvider, session.getProvider().getClient().getTelegramId());
                     return "Success! Session added from " + date + " " + time;
                 } else {
                     return "This session is already busy!";
