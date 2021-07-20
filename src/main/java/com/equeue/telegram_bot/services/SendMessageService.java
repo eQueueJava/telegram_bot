@@ -88,4 +88,9 @@ public class SendMessageService {
                 .chatId(String.valueOf(message.getChatId()))
                 .build();
     }
+
+    public void sendTextTo(String messageTest, Long telegramId) {
+        messageSender.sendTextTo(messageTest, telegramId);
+    }
+
 }
