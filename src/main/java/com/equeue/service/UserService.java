@@ -7,12 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
-import java.time.ZoneId;
 import java.util.List;
 
 @Service
 public class UserService {
-    public static final String ZONE_ID_KYIV = "Europe/Kiev";
 
     @Autowired
     UserRepository userRepository;
@@ -53,8 +51,7 @@ public class UserService {
         User client = new User()
                 .setName(name)
                 .setRole("CLIENT")
-                .setTelegramId(message.getChatId())
-                .setZoneId(ZoneId.of(ZONE_ID_KYIV));
+                .setTelegramId(message.getFrom().getId());
         save(client);
         return "Поздравляю вы зарегистрировались!\n" +
                 "Ваше имя : " + name;

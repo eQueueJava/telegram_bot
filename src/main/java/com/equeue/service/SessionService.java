@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -58,8 +57,7 @@ public class SessionService {
         String date = lines[4].trim();
         String time = lines[5].trim();
 
-        User userById = userRepository.findById(userId);
-        if (userById == null) {
+        if (userRepository.findById(userId) == null) {
             return "User with id: " + userId + " not exist!";
         }
         if (providerRepository.findById(provId) == null) {
@@ -72,14 +70,11 @@ public class SessionService {
             return "The provider has no schedule for this day!";
         }
 
-        LocalDateTime userDateTime = LocalDateTime.of(TimeUtil.localDateFromString(date), TimeUtil.localTimeFromString(time));
-        LocalDateTime utcDateTime = TimeUtil.utcDateTimeFromLocalDateTimeAndZone(userDateTime, userById.getZoneId());
-
         Map<Long, Session> sessionByProviderOfDate = sessionRepository.findSessionByProviderOfDate(provId, date);
         for (Map.Entry<Long, Session> entry : sessionByProviderOfDate.entrySet()) {
             Long sessionId = entry.getKey();
             Session session = sessionByProviderOfDate.get(sessionId);
-            if (session.getSessionStart().equals(utcDateTime)) {
+            if (TimeUtil.stringFromLocalTime(session.getSessionStart().toLocalTime()).equals(time)) {
                 User customer = session.getCustomer();
                 if (customer == null) {
                     User user = userRepository.findById(userId);
