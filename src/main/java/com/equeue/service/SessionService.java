@@ -48,8 +48,8 @@ public class SessionService {
                     "user iD: 1\n" +
                     "provider Id: 1\n" +
                     "date:\n" +
-                    "12.12.2021\n" +
-                    "09:00";
+                    "12.07.2021\n" +
+                    "11:30";
         }
         String[] lines = messageTxt.split("\n");
         long userId = getUserIdFromSelectSession(lines, 1, ":", 1);
@@ -97,7 +97,7 @@ public class SessionService {
                     Commands.GET_FREE_TIME + "\n" +
                     "provider Id: 1\n" +
                     "date:\n" +
-                    "12.12.2021";
+                    "12.07.2021";
         }
         String[] lines = messageTxt.split("\n");
         final long providerId = getProviderIdSaveSessions(lines[1]);
