@@ -13,6 +13,7 @@ public class User {
     private String name;
     private String role;
     private Long telegramId;
+    private String telegramUsername;
     private List<Provider> providers = new ArrayList<>();
     private List<Session> sessions = new ArrayList<>();
 
@@ -30,6 +31,10 @@ public class User {
 
     public Long getTelegramId() {
         return this.telegramId;
+    }
+
+    public String getTelegramUsername() {
+        return telegramUsername;
     }
 
     public List<Provider> getProviders() {
@@ -57,6 +62,11 @@ public class User {
 
     public User setTelegramId(Long telegramId) {
         this.telegramId = telegramId;
+        return this;
+    }
+
+    public User setTelegramUsername(String telegramUsername) {
+        this.telegramUsername = telegramUsername;
         return this;
     }
 
@@ -90,6 +100,7 @@ public class User {
                 "name='" + name + "', \n" +
                 "role='" + role + "', \n" +
                 "telegramId=" + telegramId + ", \n" +
+                "telegramUsername=" + telegramUsername + ", \n" +
                 "providers=" + "\n\t" +
                 (providers == null || providers.isEmpty() ? "none" : providers.stream()
                         .map(p -> "'" + p.getName() + "' (" + p.getId() + ")")
