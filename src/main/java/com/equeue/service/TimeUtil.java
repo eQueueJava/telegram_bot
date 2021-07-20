@@ -26,7 +26,7 @@ public class TimeUtil {
     }
 
     public static LocalDate localDateFromString(String stringDate) {
-        return LocalDate.parse(stringDate);
+        return LocalDate.parse(stringDate, DateTimeFormatter.ofPattern(DATE_PATTERN));
     }
 
     public static LocalDateTime localDateTimeFromString(String stringDateTime) {
