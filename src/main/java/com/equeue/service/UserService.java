@@ -77,7 +77,7 @@ public class UserService {
         return userRepository.findByName(name);
     }
 
-    private User findByTelegramId(Message message) {
+    public User findByTelegramId(Message message) {
         Long id = message.getChatId();
         return userRepository.findByTelegramId(id);
     }
