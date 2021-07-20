@@ -1,5 +1,6 @@
 package com.equeue.entity;
 
+import com.equeue.entity.enumeration.UserRole;
 import com.equeue.service.TimeUtil;
 
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ public class User {
 
     private Long id;
     private String name;
-    private String role;
+    private UserRole userRole;
     private Long telegramId;
     private String telegramUsername;
     private List<Provider> providers = new ArrayList<>();
@@ -25,8 +26,8 @@ public class User {
         return this.name;
     }
 
-    public String getRole() {
-        return this.role;
+    public UserRole getUserRole() {
+        return this.userRole;
     }
 
     public Long getTelegramId() {
@@ -55,8 +56,8 @@ public class User {
         return this;
     }
 
-    public User setRole(String role) {
-        this.role = role;
+    public User setUserRole(UserRole userRole) {
+        this.userRole = userRole;
         return this;
     }
 
@@ -85,12 +86,12 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(id, user.id) && Objects.equals(name, user.name) && Objects.equals(role, user.role) && Objects.equals(telegramId, user.telegramId) && Objects.equals(providers, user.providers) && Objects.equals(sessions, user.sessions);
+        return Objects.equals(id, user.id) && Objects.equals(name, user.name) && Objects.equals(userRole, user.userRole) && Objects.equals(telegramId, user.telegramId) && Objects.equals(providers, user.providers) && Objects.equals(sessions, user.sessions);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, role, telegramId, providers, sessions);
+        return Objects.hash(id, name, userRole, telegramId, providers, sessions);
     }
 
     @Override
@@ -98,7 +99,7 @@ public class User {
         return "User { " +
                 "id=" + id + ", \n" +
                 "name='" + name + "', \n" +
-                "role='" + role + "', \n" +
+                "userRole='" + userRole + "', \n" +
                 "telegramId=" + telegramId + ", \n" +
                 "telegramUsername=" + telegramUsername + ", \n" +
                 "providers=" + "\n\t" +

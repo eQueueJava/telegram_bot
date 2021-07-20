@@ -1,6 +1,7 @@
 package com.equeue.service;
 
 import com.equeue.entity.User;
+import com.equeue.entity.enumeration.UserRole;
 import com.equeue.repository.UserRepository;
 import com.equeue.telegram_bot.Commands;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,12 +46,12 @@ public class UserService {
             return "Пользователь c таким именем уже зарегистрировался!";
         }
         User currentUser = findByTelegramId(message);
-        if ("CLIENT".equals(currentUser.getRole())) {
+        if (currentUser.getUserRole() == UserRole.CLIENT) {
             return "Вы уже были зарегистрированы ранее! \n" +
                     "Ваше имя: " + currentUser.getName();
         }
 
-        currentUser.setName(name).setRole("CLIENT");
+        currentUser.setName(name).setUserRole(UserRole.CLIENT);
         save(currentUser);
         return "Поздравляю вы зарегистрировались!\n" +
                 "Ваше имя : " + name;
@@ -87,7 +88,7 @@ public class UserService {
             String tgUsername = message.getFrom().getUserName();
             userRepository.save(new User()
                     .setName(tgUsername)
-                    .setRole("GUEST")
+                    .setUserRole(UserRole.GUEST)
                     .setTelegramId(tgId)
                     .setTelegramUsername(tgUsername));
         }
