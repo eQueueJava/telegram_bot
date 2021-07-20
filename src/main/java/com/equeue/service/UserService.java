@@ -44,15 +44,14 @@ public class UserService {
         if (findByName(name).getId() != null) {
             return "Пользователь c таким именем уже зарегистрировался!";
         }
-        if (findByTelegramId(message).getTelegramId() != null) {
-            return "Вы уже зарегистрированы!";
+        User currentUser = findByTelegramId(message);
+        if ("CLIENT".equals(currentUser.getRole())) {
+            return "Вы уже были зарегистрированы ранее! \n" +
+                    "Ваше имя: " + currentUser.getName();
         }
 
-        User client = new User()
-                .setName(name)
-                .setRole("CLIENT")
-                .setTelegramId(message.getFrom().getId());
-        save(client);
+        currentUser.setName(name).setRole("CLIENT");
+        save(currentUser);
         return "Поздравляю вы зарегистрировались!\n" +
                 "Ваше имя : " + name;
     }
@@ -80,5 +79,17 @@ public class UserService {
     public User findByTelegramId(Message message) {
         Long id = message.getChatId();
         return userRepository.findByTelegramId(id);
+    }
+
+    public void registerGuestUserIfNotExist(Message message) {
+        Long tgId = message.getFrom().getId();
+        if (userRepository.findByTelegramId(tgId) == null) {
+            String tgUsername = message.getFrom().getUserName();
+            userRepository.save(new User()
+                    .setName(tgUsername)
+                    .setRole("GUEST")
+                    .setTelegramId(tgId)
+                    .setTelegramUsername(tgUsername));
+        }
     }
 }

@@ -26,6 +26,8 @@ public class SendMessageService {
     private SessionService sessionService;
 
     public void distribution(Message message) {
+        userService.registerGuestUserIfNotExist(message);
+
         String command = getCommand(message.getText());
 
         switch (command) {
