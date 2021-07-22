@@ -2,6 +2,7 @@ package com.equeue.repository;
 
 import com.equeue.entity.Schedule;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface ScheduleRepository {
@@ -10,12 +11,8 @@ public interface ScheduleRepository {
 
     List<Schedule> findAll();
 
-    boolean hasProviderAnySchedules(Long providerId);
+    Collection<Schedule> findAllByProvider(Long providerId);
 
-    boolean hasProviderScheduleSpecificDay(Long providerId, String date);
-
-    Schedule getScheduleOfCurrentDay(Long providerId, String date);
-
-    List<String> generateTemplate(Schedule schedule);
+    Schedule findByProviderAndDayOfWeek(Long providerId, Integer value);
 
 }

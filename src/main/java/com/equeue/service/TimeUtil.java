@@ -1,8 +1,5 @@
 package com.equeue.service;
 
-import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -11,9 +8,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.ResolverStyle;
 import java.time.format.SignStyle;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 
 import static java.time.temporal.ChronoField.*;
 
@@ -73,31 +67,6 @@ public class TimeUtil {
 
     public static String getStringFromDateTime(LocalDateTime localDateTime) {
         return localDateTime.format(DateTimeFormatter.ofPattern(DATE_TIME_PATTERN));
-    }
-
-    /*
-        input:    16.07.2021,     17.07.2021,     18.07.2021
-        output:   6(п.ятниця),    7(субота),      1(неділя)
-         */
-    public static int getDayFromDate(String date) throws ParseException {
-        SimpleDateFormat formatter = new SimpleDateFormat(DATE_PATTERN, Locale.ENGLISH);
-        Calendar c = Calendar.getInstance();
-        Date dateNew = formatter.parse(date);
-        c.setTime(dateNew);
-        return c.get(Calendar.DAY_OF_WEEK);
-    }
-
-    /*
-        input:    10:30, 10:20, 10:50.
-        output:   10.5,  10.3,  10.8.
-         */
-    public static double changeStrTimeToDouble(String time) {
-        String[] split = time.split(":");
-        double v = Double.parseDouble(split[1]) / 60;
-        DecimalFormat f = new DecimalFormat("##.0");
-        String format = "0" + f.format(v);
-        format = format.replace(',', '.');
-        return Integer.parseInt(split[0]) + Double.parseDouble(format);
     }
 
 }

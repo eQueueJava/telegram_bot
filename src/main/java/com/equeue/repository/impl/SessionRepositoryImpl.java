@@ -1,14 +1,15 @@
 package com.equeue.repository.impl;
 
 import com.equeue.entity.Session;
-import com.equeue.service.TimeUtil;
-import org.springframework.stereotype.Repository;
 import com.equeue.repository.SessionRepository;
+import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Repository
 public class SessionRepositoryImpl implements SessionRepository {
@@ -35,32 +36,17 @@ public class SessionRepositoryImpl implements SessionRepository {
         return sessionMap.get(id);
     }
 
-    public Map<Long, Session> findSessionByProvider(long providerId) {
-        Map<Long, Session> res = new HashMap<>();
-        for (Map.Entry<Long, Session> entry : sessionMap.entrySet()) {
-            Long id = entry.getKey();
-            Session session = sessionMap.get(id);
-            Long provId = session.getProvider().getId();
-            if (provId == providerId) {
-                res.put(id, session);
-            }
-        }
-        return res;
+    public List<Session> findByProvider(Long providerId) {
+        return sessionMap.values().stream()
+                .filter(s -> s.getProvider().getId().equals(providerId))
+                .collect(Collectors.toList());
     }
 
-    public Map<Long, Session> findSessionByProviderOfDate(long providerId, String date) {
-        Map<Long, Session> res = new HashMap<>();
-        Map<Long, Session> sessionByProv = findSessionByProvider(providerId);
-        if (!sessionByProv.isEmpty()){
-            for (Map.Entry<Long, Session> entry : sessionMap.entrySet()) {
-                Long key = entry.getKey();
-                Session session = sessionByProv.get(key);
-                String trim = TimeUtil.getStringFromDate(session.getSessionStart().toLocalDate()).trim();
-                if (date.equals(trim)){
-                    res.put(key, session);
-                }
-            }
-        }
-        return res;
+    public List<Session> findByProviderAndDate(Long providerId, LocalDate date) {
+        return sessionMap.values().stream()
+                .filter(s -> s.getProvider().getId().equals(providerId))
+                .filter(s -> s.getSessionStart().toLocalDate().equals(date))
+                .collect(Collectors.toList());
     }
+
 }
