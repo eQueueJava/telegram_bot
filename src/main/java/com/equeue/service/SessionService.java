@@ -77,7 +77,7 @@ public class SessionService {
         for (Map.Entry<Long, Session> entry : sessionByProviderOfDate.entrySet()) {
             Long sessionId = entry.getKey();
             Session session = sessionByProviderOfDate.get(sessionId);
-            if (TimeUtil.stringFromLocalTime(session.getSessionStart().toLocalTime()).equals(time)) {
+            if (TimeUtil.getStringFromTime(session.getSessionStart().toLocalTime()).equals(time)) {
                 User customer = session.getCustomer();
                 if (customer == null) {
                     User user = userRepository.findById(userId);
@@ -87,7 +87,7 @@ public class SessionService {
                     String messageForProvider = "New record: @" + session.getCustomer().getTelegramUsername() +
                             "(t.me/" + session.getCustomer().getTelegramUsername() + ")" +
                             "\nProvider: " + session.getProvider().getName() +
-                            "\nSession: " + TimeUtil.stringFromLocalDateTime(session.getSessionStart());
+                            "\nSession: " + TimeUtil.getStringFromDateTime(session.getSessionStart());
                     sendMessageService.sendTextTo(messageForProvider, session.getProvider().getClient().getTelegramId());
                     return "Success! Session added from " + date + " " + time;
                 } else {
@@ -135,7 +135,7 @@ public class SessionService {
             Long sessionId = entry.getKey();
             Session session = sessionByProviderOfDate.get(sessionId);
             if (session.getCustomer() == null) {
-                res.append(TimeUtil.stringFromLocalTime(session.getSessionStart().toLocalTime())).append('\n');
+                res.append(TimeUtil.getStringFromTime(session.getSessionStart().toLocalTime())).append('\n');
             }
         }
         return res.toString();
@@ -146,8 +146,8 @@ public class SessionService {
             final Session session = new Session();
             session.setProvider(providerRepository.findById(providerId));
             session.setCustomer(null);
-            session.setSessionStart(TimeUtil.localDateTimeFromString(line.trim() + " " + list.get(i - 1).trim()));
-            session.setSessionFinish(TimeUtil.localDateTimeFromString(line.trim() + " " + list.get(i)));
+            session.setSessionStart(TimeUtil.getDateTimeFromString(line.trim() + " " + list.get(i - 1).trim()));
+            session.setSessionFinish(TimeUtil.getDateTimeFromString(line.trim() + " " + list.get(i)));
             sessionRepository.save(session);
         }
     }

@@ -55,7 +55,7 @@ public class SessionRepositoryImpl implements SessionRepository {
             for (Map.Entry<Long, Session> entry : sessionMap.entrySet()) {
                 Long key = entry.getKey();
                 Session session = sessionByProv.get(key);
-                String trim = TimeUtil.stringFromLocalDate(session.getSessionStart().toLocalDate()).trim();
+                String trim = TimeUtil.getStringFromDate(session.getSessionStart().toLocalDate()).trim();
                 if (date.equals(trim)){
                     res.put(key, session);
                 }

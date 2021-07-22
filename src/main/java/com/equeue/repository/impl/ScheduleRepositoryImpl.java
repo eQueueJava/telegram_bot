@@ -41,21 +41,21 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
     }
 
     public boolean hasProviderScheduleSpecificDay(Long providerId, String date) {
-        int dayFromDate = TimeUtil.localDateFromString(date).getDayOfWeek().getValue();
+        int dayFromDate = TimeUtil.getDateFromString(date).getDayOfWeek().getValue();
         Map<Integer, Schedule> integerScheduleMap = scheduleMap.get(providerId);
         Schedule schedule = integerScheduleMap.get(dayFromDate);
         return schedule != null;
     }
 
     public Schedule getScheduleOfCurrentDay(Long providerId, String date){
-        int dayFromDate = TimeUtil.localDateFromString(date).getDayOfWeek().getValue();
+        int dayFromDate = TimeUtil.getDateFromString(date).getDayOfWeek().getValue();
         Map<Integer, Schedule> integerScheduleMap = scheduleMap.get(providerId);
         return integerScheduleMap.get(dayFromDate);
     }
 
     public List<String> generateTemplate(Schedule schedule) {
-        String startTime = TimeUtil.stringFromLocalTime(schedule.getWorkStart());
-        String finishTime = TimeUtil.stringFromLocalTime(schedule.getWorkFinish());
+        String startTime = TimeUtil.getStringFromTime(schedule.getWorkStart());
+        String finishTime = TimeUtil.getStringFromTime(schedule.getWorkFinish());
         double duration = schedule.getDuration() / 60.0;
         double start = TimeUtil.changeStrTimeToDouble(startTime);
         double finish = TimeUtil.changeStrTimeToDouble(finishTime);

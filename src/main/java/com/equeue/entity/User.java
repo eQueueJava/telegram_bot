@@ -109,7 +109,7 @@ public class User {
                 "sessions=" + "\n\t" +
                 (sessions == null || sessions.isEmpty() ? "none" : sessions.stream()
                         .map(s -> s.getProvider().getId() + ": " +
-                                TimeUtil.stringFromLocalDateTime(s.getSessionStart())
+                                TimeUtil.getStringFromDateTime(s.getSessionStart())
                         )
                         .collect(Collectors.joining(", \n\t"))) +
                 " }";

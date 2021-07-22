@@ -44,8 +44,8 @@ public class ScheduleService {
         schedule
                 .setProvider(providerRepository.findById(Long.valueOf(lines[1].replace("provider:", "").trim())))
                 .setDayOfWeek(Integer.valueOf(lines[2].replace("dayOfWeek:", "").trim()))
-                .setWorkStart(TimeUtil.localTimeFromString(lines[3].replace("workStart:", "").trim()))
-                .setWorkFinish(TimeUtil.localTimeFromString(lines[4].replace("workFinish:", "").trim()))
+                .setWorkStart(TimeUtil.getTimeFromString(lines[3].replace("workStart:", "").trim()))
+                .setWorkFinish(TimeUtil.getTimeFromString(lines[4].replace("workFinish:", "").trim()))
                 .setDuration(Integer.valueOf(lines[5].replace("duration:", "").trim()));
         save(schedule);
         return schedule.toString();

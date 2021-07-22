@@ -72,7 +72,7 @@ public class Provider {
                 "client='" + client.getName() + "' (" + client.getId() + ")" + ", \n" +
                 "schedules=" + " \n\t" +
                 (scheduleMap == null || scheduleMap.size() == 0 ? "none" : scheduleMap.values().stream()
-                        .map(s -> DayOfWeek.of(s.getDayOfWeek()) + ":\t" + TimeUtil.stringFromLocalTime(s.getWorkStart()) + "-" + TimeUtil.stringFromLocalTime(s.getWorkFinish()) + " (" + s.getDuration() + "min)")
+                        .map(s -> DayOfWeek.of(s.getDayOfWeek()) + ":\t" + TimeUtil.getStringFromTime(s.getWorkStart()) + "-" + TimeUtil.getStringFromTime(s.getWorkFinish()) + " (" + s.getDuration() + "min)")
                         .collect(Collectors.joining(", \n\t"))) +
                 " }";
     }

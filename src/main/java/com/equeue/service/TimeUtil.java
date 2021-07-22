@@ -21,27 +21,27 @@ public class TimeUtil {
         throw new IllegalStateException("Utility class");
     }
 
-    public static LocalTime localTimeFromString(String stringTime) {
+    public static LocalTime getTimeFromString(String stringTime) {
         return LocalTime.parse(stringTime, DateTimeFormatter.ofPattern(TIME_PATTERN));
     }
 
-    public static LocalDate localDateFromString(String stringDate) {
+    public static LocalDate getDateFromString(String stringDate) {
         return LocalDate.parse(stringDate, DateTimeFormatter.ofPattern(DATE_PATTERN));
     }
 
-    public static LocalDateTime localDateTimeFromString(String stringDateTime) {
+    public static LocalDateTime getDateTimeFromString(String stringDateTime) {
         return LocalDateTime.parse(stringDateTime, DateTimeFormatter.ofPattern(DATE_TIME_PATTERN));
     }
 
-    public static String stringFromLocalTime(LocalTime localTime) {
+    public static String getStringFromTime(LocalTime localTime) {
         return localTime.format(DateTimeFormatter.ofPattern(TIME_PATTERN));
     }
 
-    public static String stringFromLocalDate(LocalDate localDate) {
+    public static String getStringFromDate(LocalDate localDate) {
         return localDate.format(DateTimeFormatter.ofPattern(DATE_PATTERN));
     }
 
-    public static String stringFromLocalDateTime(LocalDateTime localDateTime) {
+    public static String getStringFromDateTime(LocalDateTime localDateTime) {
         return localDateTime.format(DateTimeFormatter.ofPattern(DATE_TIME_PATTERN));
     }
 
