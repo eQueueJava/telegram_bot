@@ -3,7 +3,6 @@ package com.equeue.repository.impl;
 import com.equeue.entity.User;
 import org.springframework.stereotype.Repository;
 import com.equeue.repository.UserRepository;
-import org.springframework.validation.BindingResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +13,7 @@ import java.util.Map;
 public class UserRepositoryImpl implements UserRepository {
 
     private static final Map<Long, User> USER_MAP = new HashMap<>();
-    Long id = 1L;
+    private Long id = 1L;
 
     @Override
     public User save(User user) {
@@ -53,5 +52,10 @@ public class UserRepositoryImpl implements UserRepository {
             }
         }
         return new User();
+    }
+
+    @Override
+    public User deleteUser(Long id) {
+        return USER_MAP.remove(id);
     }
 }

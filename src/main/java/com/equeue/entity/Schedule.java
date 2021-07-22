@@ -82,5 +82,4 @@ public class Schedule {
                 "duration=" + duration +
                 " }";
     }
-
 }

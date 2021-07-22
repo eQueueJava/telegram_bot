@@ -1,6 +1,8 @@
 package com.equeue.repository.impl;
 
+import com.equeue.entity.Provider;
 import com.equeue.entity.Schedule;
+import com.equeue.entity.User;
 import com.equeue.repository.ProviderRepository;
 import com.equeue.repository.ScheduleRepository;
 import com.equeue.service.HelperService;
@@ -17,14 +19,15 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
     @Autowired
     ProviderRepository providerRepository;
 
-    Map<Long, Map<Integer, Schedule>> scheduleMap = new HashMap<>();
+    //long->provider
+    static final Map<Long, Map<Integer, Schedule>> SCHEDULE_MAP = new HashMap<>();
 
     @Override
     public Schedule save(Schedule schedule) {
         final Long providerId = schedule.getProvider().getId();
         final Integer dayOfWeek = schedule.getDayOfWeek();
-        scheduleMap.computeIfAbsent(providerId, k -> new TreeMap<>());
-        Map<Integer, Schedule> providerScheduleMap = scheduleMap.get(providerId);
+        SCHEDULE_MAP.computeIfAbsent(providerId, k -> new TreeMap<>());
+        Map<Integer, Schedule> providerScheduleMap = SCHEDULE_MAP.get(providerId);
         providerScheduleMap.put(dayOfWeek, schedule);
         providerRepository.findById(providerId).setScheduleMap(providerScheduleMap);
         return providerScheduleMap.get(dayOfWeek);
@@ -32,23 +35,23 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
 
     @Override
     public List<Schedule> findAll() {
-        return scheduleMap.values().stream().flatMap(m -> m.values().stream()).collect(Collectors.toList());
+        return SCHEDULE_MAP.values().stream().flatMap(m -> m.values().stream()).collect(Collectors.toList());
     }
 
     public boolean hasProviderAnySchedules(Long providerId) {
-        return scheduleMap.containsKey(providerId);
+        return SCHEDULE_MAP.containsKey(providerId);
     }
 
     public boolean hasProviderScheduleSpecificDay(Long providerId, String date) {
         int dayFromDate = TimeUtil.localDateFromString(date).getDayOfWeek().getValue();
-        Map<Integer, Schedule> integerScheduleMap = scheduleMap.get(providerId);
+        Map<Integer, Schedule> integerScheduleMap = SCHEDULE_MAP.get(providerId);
         Schedule schedule = integerScheduleMap.get(dayFromDate);
         return schedule != null;
     }
 
     public Schedule getScheduleOfCurrentDay(Long providerId, String date){
         int dayFromDate = TimeUtil.localDateFromString(date).getDayOfWeek().getValue();
-        Map<Integer, Schedule> integerScheduleMap = scheduleMap.get(providerId);
+        Map<Integer, Schedule> integerScheduleMap = SCHEDULE_MAP.get(providerId);
         return integerScheduleMap.get(dayFromDate);
     }
 
@@ -66,6 +69,21 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
         }
         list = HelperService.formList(list);
         return list;
+    }
+
+    @Override
+    public List<Schedule> deleteAllForProvider(Provider provider) {
+        List<Schedule> schedules = new ArrayList<>();
+        //test//todo
+        for (Map.Entry<Long, Map<Integer, Schedule>> entry: SCHEDULE_MAP.entrySet()) {
+            for (Map.Entry<Integer, Schedule> secondEntry: entry.getValue().entrySet()) {
+                if(secondEntry.getValue().getProvider().equals(provider)){
+                    schedules.add(secondEntry.getValue());
+                    SCHEDULE_MAP.remove(entry.getKey());
+                }//todo
+            }
+        }
+        return schedules;
     }
 
     private String generateTime(double i, double duration) {

@@ -31,31 +31,34 @@ public class SendMessageService {
         switch (command) {
             case "/":
             case "/start":
-                messageSender.sendMessage(getSendMessage(message, String.join("\n", Commands.getCommandMap().values())));
+                messageSender.deleteMessage(getSendMessage(message, String.join("\n", Commands.getCommandMap().values())));
                 break;
             case Commands.CREATE_CLIENT:
-                messageSender.sendMessage(getSendMessage(message, userService.save(message)));
+                messageSender.deleteMessage(getSendMessage(message, userService.save(message)));
                 break;
             case Commands.CREATE_PROVIDER:
-                messageSender.sendMessage(getSendMessage(message, providerService.save(message)));
+                messageSender.deleteMessage(getSendMessage(message, providerService.save(message)));
                 break;
             case Commands.CREATE_SCHEDULE:
-                messageSender.sendMessage(getSendMessage(message, scheduleService.save(message)));
+                messageSender.deleteMessage(getSendMessage(message, scheduleService.save(message)));
                 break;
             case Commands.READ_CLIENT:
-                messageSender.sendMessage(getSendMessage(message, userService.findById(message)));
+                messageSender.deleteMessage(getSendMessage(message, userService.findById(message)));
                 break;
             case Commands.READ_PROVIDER:
-                messageSender.sendMessage(getSendMessage(message, providerService.findById(message)));
+                messageSender.deleteMessage(getSendMessage(message, providerService.findById(message)));
                 break;
             case Commands.GET_FREE_TIME:
-                messageSender.sendMessage(getSendMessage(message, sessionService.saveSession(message)));
+                messageSender.deleteMessage(getSendMessage(message, sessionService.saveSession(message)));
                 break;
             case Commands.INPUT_TIME:
-                messageSender.sendMessage(getSendMessage(message, sessionService.selectSession(message)));
+                messageSender.deleteMessage(getSendMessage(message, sessionService.selectSession(message)));
+                break;
+            case Commands.DELETE_CLIENT:
+                messageSender.deleteMessage(userService.askOrDeleteUser(message));
                 break;
             default:
-                messageSender.sendMessage(defaultMessage(message));
+                messageSender.deleteMessage(defaultMessage(message));
         }
     }
 
@@ -84,7 +87,7 @@ public class SendMessageService {
 
     private SendMessage defaultMessage(Message message) {
         return SendMessage.builder()
-                .text("Не вірна команда!")
+                .text("Неизвестная команда!")
                 .chatId(String.valueOf(message.getChatId()))
                 .build();
     }
