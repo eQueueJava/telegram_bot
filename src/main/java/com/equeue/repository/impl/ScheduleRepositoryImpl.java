@@ -2,7 +2,6 @@ package com.equeue.repository.impl;
 
 import com.equeue.entity.Provider;
 import com.equeue.entity.Schedule;
-import com.equeue.entity.User;
 import com.equeue.repository.ProviderRepository;
 import com.equeue.repository.ScheduleRepository;
 import com.equeue.service.HelperService;
@@ -16,18 +15,26 @@ import java.util.stream.Collectors;
 @Repository
 public class ScheduleRepositoryImpl implements ScheduleRepository {
 
-    @Autowired
     ProviderRepository providerRepository;
 
-    //long->provider
-    static final Map<Long, Map<Integer, Schedule>> SCHEDULE_MAP = new HashMap<>();
+    @Autowired
+    public ScheduleRepositoryImpl(ProviderRepository providerRepository) {
+        this.providerRepository = providerRepository;
+    }
+
+    //long->providerId
+    private static Map<Long, Map<Integer, Schedule>> scheduleMap = new HashMap<>();
+
+    public static void setScheduleMap(Map<Long, Map<Integer, Schedule>> scheduleMap) {
+        ScheduleRepositoryImpl.scheduleMap = scheduleMap;
+    }
 
     @Override
     public Schedule save(Schedule schedule) {
         final Long providerId = schedule.getProvider().getId();
         final Integer dayOfWeek = schedule.getDayOfWeek();
-        SCHEDULE_MAP.computeIfAbsent(providerId, k -> new TreeMap<>());
-        Map<Integer, Schedule> providerScheduleMap = SCHEDULE_MAP.get(providerId);
+        scheduleMap.computeIfAbsent(providerId, k -> new TreeMap<>());
+        Map<Integer, Schedule> providerScheduleMap = scheduleMap.get(providerId);
         providerScheduleMap.put(dayOfWeek, schedule);
         providerRepository.findById(providerId).setScheduleMap(providerScheduleMap);
         return providerScheduleMap.get(dayOfWeek);
@@ -35,23 +42,23 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
 
     @Override
     public List<Schedule> findAll() {
-        return SCHEDULE_MAP.values().stream().flatMap(m -> m.values().stream()).collect(Collectors.toList());
+        return scheduleMap.values().stream().flatMap(m -> m.values().stream()).collect(Collectors.toList());
     }
 
     public boolean hasProviderAnySchedules(Long providerId) {
-        return SCHEDULE_MAP.containsKey(providerId);
+        return scheduleMap.containsKey(providerId);
     }
 
     public boolean hasProviderScheduleSpecificDay(Long providerId, String date) {
         int dayFromDate = TimeUtil.localDateFromString(date).getDayOfWeek().getValue();
-        Map<Integer, Schedule> integerScheduleMap = SCHEDULE_MAP.get(providerId);
+        Map<Integer, Schedule> integerScheduleMap = scheduleMap.get(providerId);
         Schedule schedule = integerScheduleMap.get(dayFromDate);
         return schedule != null;
     }
 
     public Schedule getScheduleOfCurrentDay(Long providerId, String date){
         int dayFromDate = TimeUtil.localDateFromString(date).getDayOfWeek().getValue();
-        Map<Integer, Schedule> integerScheduleMap = SCHEDULE_MAP.get(providerId);
+        Map<Integer, Schedule> integerScheduleMap = scheduleMap.get(providerId);
         return integerScheduleMap.get(dayFromDate);
     }
 
@@ -72,15 +79,12 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
     }
 
     @Override
-    public List<Schedule> deleteAllForProvider(Provider provider) {
-        List<Schedule> schedules = new ArrayList<>();
-        //test//todo
-        for (Map.Entry<Long, Map<Integer, Schedule>> entry: SCHEDULE_MAP.entrySet()) {
-            for (Map.Entry<Integer, Schedule> secondEntry: entry.getValue().entrySet()) {
-                if(secondEntry.getValue().getProvider().equals(provider)){
-                    schedules.add(secondEntry.getValue());
-                    SCHEDULE_MAP.remove(entry.getKey());
-                }//todo
+    public Map<Integer, Schedule> deleteAllForProvider(Provider provider) {
+//        Map<Long, Map<Integer, Schedule>> scheduleMap
+        Map<Integer, Schedule> schedules = new HashMap<>();
+        for (Map.Entry<Long, Map<Integer, Schedule>> entry: scheduleMap.entrySet()) {
+            if(entry.getKey().equals(provider.getId())){
+                schedules = scheduleMap.remove(provider.getId());
             }
         }
         return schedules;

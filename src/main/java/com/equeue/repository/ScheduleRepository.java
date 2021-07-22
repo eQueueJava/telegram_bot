@@ -20,5 +20,5 @@ public interface ScheduleRepository {
 
     List<String> generateTemplate(Schedule schedule);
 
-    List<Schedule> deleteAllForProvider(Provider provider);
+    Map<Integer, Schedule> deleteAllForProvider(Provider provider);
 }
