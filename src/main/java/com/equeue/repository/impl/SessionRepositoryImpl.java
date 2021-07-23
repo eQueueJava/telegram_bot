@@ -2,19 +2,20 @@ package com.equeue.repository.impl;
 
 import com.equeue.entity.Provider;
 import com.equeue.entity.Session;
-import com.equeue.service.TimeUtil;
-import org.springframework.stereotype.Repository;
 import com.equeue.repository.SessionRepository;
+import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Repository
 public class SessionRepositoryImpl implements SessionRepository {
 
-    private static final Map<Long, Session> SESSION_MAP = new HashMap<>();
+    private static final Map<Long, Session> sessionMap = new HashMap<>();
     private Long id = 1L;
 
     @Override
@@ -22,61 +23,54 @@ public class SessionRepositoryImpl implements SessionRepository {
         if (session.getId() == null) {
             session.setId(id++);
         }
-        SESSION_MAP.put(session.getId(), session);
-        return SESSION_MAP.get(session.getId());
+        sessionMap.put(session.getId(), session);
+        return sessionMap.get(session.getId());
     }
 
     @Override
     public List<Session> findAll() {
-        return new ArrayList<>(SESSION_MAP.values());
+        return new ArrayList<>(sessionMap.values());
     }
 
     @Override
     public Session findById(Long id) {
-        return SESSION_MAP.get(id);
+        return sessionMap.get(id);
     }
 
-    public Map<Long, Session> findSessionByProvider(long providerId) {
-        Map<Long, Session> res = new HashMap<>();
-        for (Map.Entry<Long, Session> entry : SESSION_MAP.entrySet()) {
-            Long sessionId = entry.getKey();
-            Session session = SESSION_MAP.get(sessionId);
-            Long provId = session.getProvider().getId();
-            if (provId == providerId) {
-                res.put(sessionId, session);
-            }
-        }
-        return res;
+    public List<Session> findByProvider(Long providerId) {
+        return sessionMap.values().stream()
+                .filter(s -> s.getProvider().getId().equals(providerId))
+                .collect(Collectors.toList());
     }
 
-    public Map<Long, Session> findSessionByProviderOfDate(long providerId, String date) {
-        Map<Long, Session> res = new HashMap<>();
-        Map<Long, Session> sessionByProv = findSessionByProvider(providerId);
-        if (!sessionByProv.isEmpty()){
-            for (Map.Entry<Long, Session> entry : SESSION_MAP.entrySet()) {
-                Long key = entry.getKey();
-                Session session = sessionByProv.get(key);
-                String trim = TimeUtil.stringFromLocalDate(session.getSessionStart().toLocalDate()).trim();
-                if (date.equals(trim)){
-                    res.put(key, session);
-                }
-            }
-        }
-        return res;
+    public List<Session> findByProviderAndDate(Long providerId, LocalDate date) {
+        return sessionMap.values().stream()
+                .filter(s -> s.getProvider().getId().equals(providerId))
+                .filter(s -> s.getSessionStart().toLocalDate().equals(date))
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<Session> deleteAllForProvider(Provider provider) {
-        List<Session> sessions = new ArrayList<>();
-        Map<Long, Session> sessionMap = findSessionByProvider(provider.getId());
-        for (Map.Entry<Long, Session> entry: sessionMap.entrySet()) {
-            sessions.add(deleteById(entry.getKey()));
+        List<Session> sessionsDeleted = new ArrayList<>();
+        List<Session> sessionsForDel = findByProvider(provider.getId());
+        for (Session sessionForDel : sessionsForDel) {
+            sessionsDeleted.add(deleteById(sessionForDel.getId()));
         }
-        return sessions;
+        return sessionsDeleted;
     }
 
     @Override
     public Session deleteById(Long id) {
-        return SESSION_MAP.remove(id);
+        return sessionMap.remove(id);
+    }
+
+    @Override
+    public List<Session> saveAll(List<Session> sessions) {
+        List<Session> savedSessions = new ArrayList<>();
+        for (Session session : sessions) {
+            savedSessions.add(save(session));
+        }
+        return savedSessions;
     }
 }

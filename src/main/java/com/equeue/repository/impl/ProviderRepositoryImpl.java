@@ -2,10 +2,10 @@ package com.equeue.repository.impl;
 
 import com.equeue.entity.Provider;
 import com.equeue.entity.User;
+import com.equeue.repository.ProviderRepository;
 import com.equeue.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import com.equeue.repository.ProviderRepository;
 
 import java.util.ArrayList;
 import java.util.HashMap;

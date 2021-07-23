@@ -77,8 +77,8 @@ public class Session {
                 "id=" + id + ", \n" +
                 "provider=" + provider.getName() + "' (" + provider.getId() + ")" + ", \n" +
                 "customer=" + (customer == null ? "none" : (customer.getName() + "' (" + customer.getId() + ")")) + ", \n" +
-                "sessionStart=" + TimeUtil.stringFromLocalDateTime(sessionStart) + ", \n" +
-                "sessionFinish=" + TimeUtil.stringFromLocalDateTime(sessionFinish) +
+                "sessionStart=" + TimeUtil.getStringFromDateTime(sessionStart) + ", \n" +
+                "sessionFinish=" + TimeUtil.getStringFromDateTime(sessionFinish) +
                 " }";
     }
 

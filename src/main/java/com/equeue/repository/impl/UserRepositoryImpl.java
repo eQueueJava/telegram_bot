@@ -1,8 +1,8 @@
 package com.equeue.repository.impl;
 
 import com.equeue.entity.User;
-import org.springframework.stereotype.Repository;
 import com.equeue.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.HashMap;

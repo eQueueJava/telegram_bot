@@ -1,5 +1,6 @@
 package com.equeue.service;
 
+import com.equeue.entity.Provider;
 import com.equeue.entity.Schedule;
 import com.equeue.entity.Session;
 import com.equeue.entity.User;
@@ -13,8 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class SessionService {
@@ -29,7 +33,6 @@ public class SessionService {
     ScheduleRepository scheduleRepository;
     @Autowired
     SendMessageService sendMessageService;
-
 
     public Session save(Session session) {
         return sessionRepository.save(session);
@@ -55,44 +58,49 @@ public class SessionService {
                     "11:30";
         }
         String[] lines = messageTxt.split("\n");
-        long userId = getUserIdFromSelectSession(lines, 1, ":", 1);
-        long provId = getProvIdFromSelectSession(lines, 2, ":", 1);
+        long userId = getIdFromSelectSession(lines, 1, ":", 1);
+        long provId = getIdFromSelectSession(lines, 2, ":", 1);
         String date = lines[4].trim();
+        LocalDate dateFromString = TimeUtil.getDateFromString(date);
         String time = lines[5].trim();
 
-        if (userRepository.findById(userId) == null) {
+        User userById = userRepository.findById(userId);
+        if (userById == null) {
             return "User with id: " + userId + " not exist!";
         }
         if (providerRepository.findById(provId) == null) {
             return "Provider with id: " + userId + "not exist!";
         }
-        if (!scheduleRepository.hasProviderAnySchedules(provId)) {
+        if (scheduleRepository.findAllByProvider(provId).isEmpty()) {
             return "This provider does not provide any services!";
         }
-        if (!scheduleRepository.hasProviderScheduleSpecificDay(provId, date)) {
+        int dayOfWeek = dateFromString.getDayOfWeek().getValue();
+        if (scheduleRepository.findByProviderAndDayOfWeek(provId, dayOfWeek) == null) {
             return "The provider has no schedule for this day!";
         }
 
-        Map<Long, Session> sessionByProviderOfDate = sessionRepository.findSessionByProviderOfDate(provId, date);
-        for (Map.Entry<Long, Session> entry : sessionByProviderOfDate.entrySet()) {
-            Long sessionId = entry.getKey();
-            Session session = sessionByProviderOfDate.get(sessionId);
-            if (TimeUtil.stringFromLocalTime(session.getSessionStart().toLocalTime()).equals(time)) {
-                User customer = session.getCustomer();
-                if (customer == null) {
-                    User user = userRepository.findById(userId);
-                    session.setCustomer(user);
-                    List<Session> sessions = user.getSessions();
-                    sessions.add(session);
-                    String messageForProvider = "New record: @" + session.getCustomer().getTelegramUsername() +
-                            "(t.me/" + session.getCustomer().getTelegramUsername() + ")" +
-                            "\nProvider: " + session.getProvider().getName() +
-                            "\nSession: " + TimeUtil.stringFromLocalDateTime(session.getSessionStart());
-                    sendMessageService.sendTextTo(messageForProvider, session.getProvider().getClient().getTelegramId());
-                    return "Success! Session added from " + date + " " + time;
-                } else {
+        LocalDateTime userDateTime = LocalDateTime.of(TimeUtil.getDateFromString(date), TimeUtil.getTimeFromString(time));
+        LocalDateTime utcDateTime = TimeUtil.getUtcDateTimeFromDateTimeAndZone(userDateTime, userById.getZoneId());
+
+        List<Session> sessionsByProviderAndDate = sessionRepository.findByProviderAndDate(provId, dateFromString);
+        for (Session session : sessionsByProviderAndDate) {
+            if (session.getSessionStart().toLocalTime().equals(utcDateTime.toLocalTime())) {
+                if (session.getCustomer() != null) {
                     return "This session is already busy!";
                 }
+                User customer = userRepository.findByTelegramId(message.getFrom().getId());
+                session.setCustomer(customer);
+                List<Session> sessions = customer.getSessions();
+                sessions.add(session);
+                String messageForProvider = "New record: @" + session.getCustomer().getTelegramUsername() +
+                        "(t.me/" + session.getCustomer().getTelegramUsername() + ")" +
+                        "\nProvider: " + session.getProvider().getName() +
+                        "\nSession: " + TimeUtil.getStringFromDateTime(
+                                TimeUtil.getDateTimeFromUtcDateTimeForZone(
+                                        session.getSessionStart(),
+                                        userRepository.findByTelegramId(message.getFrom().getId()).getZoneId()));
+                sendMessageService.sendTextTo(messageForProvider, session.getProvider().getClient().getTelegramId());
+                return "Success! Session added from " + date + " " + time;
             }
         }
         return "This session does not exist!";
@@ -110,44 +118,63 @@ public class SessionService {
         String[] lines = messageTxt.split("\n");
         final long providerId = getProviderIdSaveSessions(lines[1]);
         final String date = lines[3].trim();
+        LocalDate dateFromString = TimeUtil.getDateFromString(date);
 
         if (providerRepository.findById(providerId) == null) {
             return "There is no provider with that id: " + providerId + "!";
         }
-        if (!scheduleRepository.hasProviderAnySchedules(providerId)) {
+        if (scheduleRepository.findAllByProvider(providerId).isEmpty()) {
             return "This provider does not provide any services!";
         }
-        Map<Long, Session> sessionByProvider = sessionRepository.findSessionByProviderOfDate(providerId, date);
+        List<Session> sessionByProvider = sessionRepository.findByProviderAndDate(providerId, dateFromString);
         if (sessionByProvider.isEmpty()) {
-            Schedule schedule;
-            if (!scheduleRepository.hasProviderScheduleSpecificDay(providerId, date)) {
+            List<Session> sessions = getSessions(providerId, dateFromString);
+            if (sessions.isEmpty()) {
                 return "The provider has no schedule for this day: " + date + "!";
-            } else {
-                schedule = scheduleRepository.getScheduleOfCurrentDay(providerId, date);
             }
-            List<String> list = scheduleRepository.generateTemplate(schedule);
-            addGeneratedSessions(lines[3], providerId, list);
+            sessionRepository.saveAll(sessions);
         }
 
-        Map<Long, Session> sessionByProviderOfDate = sessionRepository.findSessionByProviderOfDate(providerId, date);
+        List<Session> sessionByProviderAndDate = sessionRepository.findByProviderAndDate(providerId, dateFromString);
         StringBuilder res = new StringBuilder();
-        for (Map.Entry<Long, Session> entry : sessionByProviderOfDate.entrySet()) {
-            Long sessionId = entry.getKey();
-            Session session = sessionByProviderOfDate.get(sessionId);
+        for (Session session : sessionByProviderAndDate) {
             if (session.getCustomer() == null) {
-                res.append(TimeUtil.stringFromLocalTime(session.getSessionStart().toLocalTime())).append('\n');
+                res.append(TimeUtil.getStringFromTime(
+                        TimeUtil.getDateTimeFromUtcDateTimeForZone(
+                                session.getSessionStart(),
+                                userRepository.findByTelegramId(message.getFrom().getId()).getZoneId()).toLocalTime())).append('\n');
             }
         }
         return res.toString();
     }
 
-    private void addGeneratedSessions(String line, long providerId, List<String> list) {
-        for (int i = 1; i < list.size(); i++) {
-            final Session session = new Session();
-            session.setProvider(providerRepository.findById(providerId));
-            session.setCustomer(null);
-            session.setSessionStart(TimeUtil.localDateTimeFromString(line.trim() + " " + list.get(i - 1).trim()));
-            session.setSessionFinish(TimeUtil.localDateTimeFromString(line.trim() + " " + list.get(i)));
+    private List<Session> getSessions(long providerId, LocalDate date) {
+        int dayOfWeek = date.getDayOfWeek().getValue();
+        Schedule schedule = scheduleRepository.findByProviderAndDayOfWeek(providerId, dayOfWeek);
+        if (schedule == null) {
+            return new ArrayList<>();
+        }
+        Provider provider = schedule.getProvider();
+        Integer duration = schedule.getDuration();
+        LocalTime workFinish = schedule.getWorkFinish();
+        LocalTime sessionStart = schedule.getWorkStart();
+        LocalTime sessionFinish = sessionStart.plusMinutes(duration);
+        List<Session> generatedSessions = new ArrayList<>();
+        while (sessionFinish.compareTo(workFinish) <= 0) {
+            generatedSessions.add(new Session()
+                    .setProvider(provider)
+                    .setSessionStart(sessionStart.atDate(date))
+                    .setSessionFinish(sessionFinish.atDate(date)));
+            sessionStart = sessionFinish;
+            sessionFinish = sessionStart.plusMinutes(duration);
+        }
+        return generatedSessions;
+    }
+
+    private void addGeneratedSessions(List<Session> sessions, LocalDate date) {
+        for (Session session : sessions) {
+            session.setSessionStart(session.getSessionStart().with(date));
+            session.setSessionFinish(session.getSessionFinish().with(date));
             sessionRepository.save(session);
         }
     }
@@ -157,13 +184,9 @@ public class SessionService {
         return Long.parseLong(rowTwo[2].trim());
     }
 
-    private long getProvIdFromSelectSession(String[] lines, int i, String s, int i2) {
+    private long getIdFromSelectSession(String[] lines, int i, String s, int i2) {
         String[] line3 = lines[i].split(s);
         return Long.parseLong(line3[i2].trim());
     }
 
-    private long getUserIdFromSelectSession(String[] lines, int i, String s, int i2) {
-        String[] lines2 = lines[i].split(s);
-        return Long.parseLong(lines2[i2].trim());
-    }
 }

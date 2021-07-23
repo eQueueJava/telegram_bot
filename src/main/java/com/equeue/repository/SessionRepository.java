@@ -3,8 +3,8 @@ package com.equeue.repository;
 import com.equeue.entity.Provider;
 import com.equeue.entity.Session;
 
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 public interface SessionRepository {
 
@@ -14,11 +14,13 @@ public interface SessionRepository {
 
     Session findById(Long id);
 
-    Map<Long, Session> findSessionByProvider(long providerId);
+    List<Session> findByProvider(Long providerId);
 
-    Map<Long, Session> findSessionByProviderOfDate(long providerId, String date);
+    List<Session> findByProviderAndDate(Long providerId, LocalDate date);
 
     List<Session> deleteAllForProvider(Provider provider);
 
     Session deleteById(Long id);
+
+    List<Session> saveAll(List<Session> sessions);
 }

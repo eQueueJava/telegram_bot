@@ -5,15 +5,16 @@ import com.equeue.entity.Schedule;
 import com.equeue.entity.User;
 import com.equeue.entity.enumeration.UserRole;
 import com.equeue.repository.ProviderRepository;
+import com.equeue.repository.ScheduleRepository;
 import com.equeue.repository.impl.ScheduleRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalTime;
-import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,11 +24,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ScheduleRepositoryTests {
     @Mock
     private ProviderRepository providerRepository;
-    ScheduleRepositoryImpl scheduleRepository;
+    ScheduleRepository scheduleRepository;
 
     @BeforeEach
     void setUp(){
-        scheduleRepository = new ScheduleRepositoryImpl(providerRepository);
+        scheduleRepository = new ScheduleRepositoryImpl();
     }
 
     @Test
