@@ -3,6 +3,7 @@ package com.equeue.entity;
 import com.equeue.entity.enumeration.UserRole;
 import com.equeue.service.TimeUtil;
 
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -15,6 +16,7 @@ public class User {
     private UserRole userRole;
     private Long telegramId;
     private String telegramUsername;
+    private ZoneId zoneId;
     private List<Provider> providers = new ArrayList<>();
     private List<Session> sessions = new ArrayList<>();
 
@@ -36,6 +38,10 @@ public class User {
 
     public String getTelegramUsername() {
         return telegramUsername;
+    }
+
+    public ZoneId getZoneId() {
+        return zoneId;
     }
 
     public List<Provider> getProviders() {
@@ -71,6 +77,11 @@ public class User {
         return this;
     }
 
+    public User setZoneId(ZoneId zoneId) {
+        this.zoneId = zoneId;
+        return this;
+    }
+
     public User setProviders(List<Provider> providers) {
         this.providers = providers;
         return this;
@@ -102,6 +113,7 @@ public class User {
                 "userRole='" + userRole + "', \n" +
                 "telegramId=" + telegramId + ", \n" +
                 "telegramUsername=" + telegramUsername + ", \n" +
+                "timeZone=" + zoneId +  ", \n" +
                 "providers=" + "\n\t" +
                 (providers == null || providers.isEmpty() ? "none" : providers.stream()
                         .map(p -> "'" + p.getName() + "' (" + p.getId() + ")")

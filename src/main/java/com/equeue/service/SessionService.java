@@ -17,6 +17,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -64,7 +65,8 @@ public class SessionService {
         String time = lines[5].trim();
         LocalTime timeFromString = TimeUtil.getTimeFromString(time);
 
-        if (userRepository.findById(userId) == null) {
+        User userById = userRepository.findById(userId);
+        if (userById == null) {
             return "User with id: " + userId + " not exist!";
         }
         if (providerRepository.findById(provId) == null) {
@@ -78,9 +80,12 @@ public class SessionService {
             return "The provider has no schedule for this day!";
         }
 
+        LocalDateTime userDateTime = LocalDateTime.of(TimeUtil.localDateFromString(date), TimeUtil.localTimeFromString(time));
+        LocalDateTime utcDateTime = TimeUtil.utcDateTimeFromLocalDateTimeAndZone(userDateTime, userById.getZoneId());
+
         List<Session> sessionsByProviderAndDate = sessionRepository.findByProviderAndDate(provId, dateFromString);
         for (Session session : sessionsByProviderAndDate) {
-            if (session.getSessionStart().toLocalTime().equals(timeFromString)) {
+            if (session.getSessionStart().toLocalTime().equals(utcDateTime)) {
                 if (session.getCustomer() != null) {
                     return "This session is already busy!";
                 }

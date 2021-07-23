@@ -4,6 +4,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.chrono.IsoChronology;
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.ResolverStyle;
@@ -67,6 +71,26 @@ public class TimeUtil {
 
     public static String getStringFromDateTime(LocalDateTime localDateTime) {
         return localDateTime.format(DateTimeFormatter.ofPattern(DATE_TIME_PATTERN));
+    }
+
+    public static LocalTime localTimeFromUtcTimeForZone(LocalTime localTime, ZoneId zoneId) {
+        return ZonedDateTime.of(localTime.atDate(LocalDate.EPOCH), ZoneId.of("UTC"))
+                .withZoneSameInstant(zoneId).toLocalTime();
+    }
+
+    static LocalTime utcTimeFromLocalTimeAndZone(LocalTime localTime, ZoneId zoneId) {
+        return ZonedDateTime.of(localTime.atDate(LocalDate.EPOCH), zoneId).
+                withZoneSameInstant(ZoneOffset.UTC).toLocalTime();
+    }
+
+    public static LocalDateTime localDateTimeFromUtcDateTimeForZone(LocalDateTime localDateTime, ZoneId zoneId) {
+        return ZonedDateTime.of(localDateTime, ZoneId.of("UTC"))
+                .withZoneSameInstant(zoneId).toLocalDateTime();
+    }
+
+    public static LocalDateTime utcDateTimeFromLocalDateTimeAndZone(LocalDateTime localDateTime, ZoneId zoneId) {
+        return ZonedDateTime.of(localDateTime, zoneId)
+                .withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
     }
 
 }
