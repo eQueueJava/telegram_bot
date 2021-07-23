@@ -3,6 +3,7 @@ package com.equeue.telegram_bot.repository_test;
 import com.equeue.entity.Provider;
 import com.equeue.entity.Schedule;
 import com.equeue.entity.User;
+import com.equeue.entity.enumeration.UserRole;
 import com.equeue.repository.ProviderRepository;
 import com.equeue.repository.impl.ScheduleRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,7 +54,7 @@ public class ScheduleRepositoryTests {
     private Schedule getSchedule1() {
         Schedule schedule1 = new Schedule();
         Provider provider1 = new Provider().setId(1L).setClient(
-                new User().setId(1L).setName("TestUser1").setRole("CLIENT").setTelegramId(1111111111L).setZoneId(ZoneId.of("Europe/Kiev")));
+                new User().setId(1L).setName("TestUser1").setUserRole(UserRole.CLIENT).setTelegramId(1111111111L));
         schedule1.setProvider(provider1);
         schedule1.setDayOfWeek(1);
         schedule1.setWorkStart(LocalTime.of(6, 0));
@@ -65,7 +66,7 @@ public class ScheduleRepositoryTests {
     private Schedule getSchedule2() {
         Schedule schedule2 = new Schedule();
         Provider provider2 = new Provider().setId(2L).setClient(
-                new User().setId(2L).setName("TestUser2").setRole("CLIENT").setTelegramId(22222222L).setZoneId(ZoneId.of("Europe/Kiev")));
+                new User().setId(2L).setName("TestUser2").setUserRole(UserRole.CLIENT).setTelegramId(22222222L));
         schedule2.setProvider(provider2);
         schedule2.setDayOfWeek(1);
         schedule2.setWorkStart(LocalTime.of(10, 0));

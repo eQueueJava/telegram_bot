@@ -22,13 +22,13 @@ public class ButtonProcessingService {
 
         switch (command){
             case "/button_delete_yes":
-                messageSender.deleteMessage(getSendMessage(message, userService.deleteUser(message)));
+                messageSender.sendMessage(getSendMessage(message, userService.deleteUser(message)));
                 break;
             case "/button_delete_no":
                 messageSender.deleteMessage(deleteMessage(message));
                 break;
             default:
-                messageSender.deleteMessage(getSendMessage(message, "Неизвестная кнопка!"));
+                messageSender.sendMessage(getSendMessage(message, "Неизвестная кнопка!"));
         }
     }
 

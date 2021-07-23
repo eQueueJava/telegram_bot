@@ -33,37 +33,37 @@ public class SendMessageService {
         switch (command) {
             case "/":
             case "/start":
-                messageSender.deleteMessage(getSendMessage(message, String.join("\n", Commands.getCommandMap().values())));
+                messageSender.sendMessage(getSendMessage(message, String.join("\n", Commands.getCommandMap().values())));
                 break;
             case Commands.SHOW_CURRENT_USER_INFO:
                 messageSender.sendMessage(getSendMessage(message, userService.findByTelegramId(message).toString()));
                 break;
             case Commands.CREATE_CLIENT:
-                messageSender.deleteMessage(getSendMessage(message, userService.save(message)));
+                messageSender.sendMessage(getSendMessage(message, userService.save(message)));
                 break;
             case Commands.CREATE_PROVIDER:
-                messageSender.deleteMessage(getSendMessage(message, providerService.save(message)));
+                messageSender.sendMessage(getSendMessage(message, providerService.save(message)));
                 break;
             case Commands.CREATE_SCHEDULE:
-                messageSender.deleteMessage(getSendMessage(message, scheduleService.save(message)));
+                messageSender.sendMessage(getSendMessage(message, scheduleService.save(message)));
                 break;
             case Commands.READ_CLIENT:
-                messageSender.deleteMessage(getSendMessage(message, userService.findById(message)));
+                messageSender.sendMessage(getSendMessage(message, userService.findById(message)));
                 break;
             case Commands.READ_PROVIDER:
-                messageSender.deleteMessage(getSendMessage(message, providerService.findById(message)));
+                messageSender.sendMessage(getSendMessage(message, providerService.findById(message)));
                 break;
             case Commands.GET_FREE_TIME:
-                messageSender.deleteMessage(getSendMessage(message, sessionService.saveSession(message)));
+                messageSender.sendMessage(getSendMessage(message, sessionService.saveSession(message)));
                 break;
             case Commands.INPUT_TIME:
-                messageSender.deleteMessage(getSendMessage(message, sessionService.selectSession(message)));
+                messageSender.sendMessage(getSendMessage(message, sessionService.selectSession(message)));
                 break;
             case Commands.DELETE_CLIENT:
-                messageSender.deleteMessage(userService.askOrDeleteUser(message));
+                messageSender.sendMessage(userService.askOrDeleteUser(message));
                 break;
             default:
-                messageSender.deleteMessage(defaultMessage(message));
+                messageSender.sendMessage(defaultMessage(message));
         }
     }
 
