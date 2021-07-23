@@ -4,7 +4,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 
 public interface MessageSender {
-    void deleteMessage(SendMessage sendMessage);
+    void sendMessage(SendMessage sendMessage);
 
     void deleteMessage(DeleteMessage deleteMessage);
 }

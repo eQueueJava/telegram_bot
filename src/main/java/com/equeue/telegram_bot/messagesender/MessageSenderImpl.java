@@ -14,7 +14,7 @@ public class MessageSenderImpl implements MessageSender {
     private EQueueBot eQueueBot;
 
     @Override
-    public void deleteMessage(SendMessage sendMessage) {
+    public void sendMessage(SendMessage sendMessage) {
         try {
             eQueueBot.execute(sendMessage);
         } catch (TelegramApiException e) {

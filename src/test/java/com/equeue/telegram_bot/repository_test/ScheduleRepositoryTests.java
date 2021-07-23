@@ -73,6 +73,4 @@ public class ScheduleRepositoryTests {
         schedule2.setDuration(30);
         return schedule2;
     }
-
-
 }
