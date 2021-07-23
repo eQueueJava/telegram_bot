@@ -8,11 +8,11 @@ import com.equeue.repository.ScheduleRepository;
 import com.equeue.repository.SessionRepository;
 import com.equeue.repository.UserRepository;
 import com.equeue.telegram_bot.Commands;
+import com.equeue.telegram_bot.services.SendMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +27,8 @@ public class SessionService {
     UserRepository userRepository;
     @Autowired
     ScheduleRepository scheduleRepository;
+    @Autowired
+    SendMessageService sendMessageService;
 
 
     public Session save(Session session) {
@@ -49,8 +51,8 @@ public class SessionService {
                     "user iD: 1\n" +
                     "provider Id: 1\n" +
                     "date:\n" +
-                    "12.12.2021\n" +
-                    "09:00";
+                    "12.07.2021\n" +
+                    "11:30";
         }
         String[] lines = messageTxt.split("\n");
         long userId = getUserIdFromSelectSession(lines, 1, ":", 1);
@@ -58,8 +60,7 @@ public class SessionService {
         String date = lines[4].trim();
         String time = lines[5].trim();
 
-        User userById = userRepository.findById(userId);
-        if (userById == null) {
+        if (userRepository.findById(userId) == null) {
             return "User with id: " + userId + " not exist!";
         }
         if (providerRepository.findById(provId) == null) {
@@ -72,20 +73,22 @@ public class SessionService {
             return "The provider has no schedule for this day!";
         }
 
-        LocalDateTime userDateTime = LocalDateTime.of(TimeUtil.localDateFromString(date), TimeUtil.localTimeFromString(time));
-        LocalDateTime utcDateTime = TimeUtil.utcDateTimeFromLocalDateTimeAndZone(userDateTime, userById.getZoneId());
-
         Map<Long, Session> sessionByProviderOfDate = sessionRepository.findSessionByProviderOfDate(provId, date);
         for (Map.Entry<Long, Session> entry : sessionByProviderOfDate.entrySet()) {
             Long sessionId = entry.getKey();
             Session session = sessionByProviderOfDate.get(sessionId);
-            if (session.getSessionStart().equals(utcDateTime)) {
+            if (TimeUtil.stringFromLocalTime(session.getSessionStart().toLocalTime()).equals(time)) {
                 User customer = session.getCustomer();
                 if (customer == null) {
                     User user = userRepository.findById(userId);
                     session.setCustomer(user);
                     List<Session> sessions = user.getSessions();
                     sessions.add(session);
+                    String messageForProvider = "New record: @" + session.getCustomer().getTelegramUsername() +
+                            "(t.me/" + session.getCustomer().getTelegramUsername() + ")" +
+                            "\nProvider: " + session.getProvider().getName() +
+                            "\nSession: " + TimeUtil.stringFromLocalDateTime(session.getSessionStart());
+                    sendMessageService.sendTextTo(messageForProvider, session.getProvider().getClient().getTelegramId());
                     return "Success! Session added from " + date + " " + time;
                 } else {
                     return "This session is already busy!";
@@ -102,7 +105,7 @@ public class SessionService {
                     Commands.GET_FREE_TIME + "\n" +
                     "provider Id: 1\n" +
                     "date:\n" +
-                    "12.12.2021";
+                    "12.07.2021";
         }
         String[] lines = messageTxt.split("\n");
         final long providerId = getProviderIdSaveSessions(lines[1]);

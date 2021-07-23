@@ -51,7 +51,7 @@ public class UserRepositoryImpl implements UserRepository {
                 return entry.getValue();
             }
         }
-        return new User();
+        return null;
     }
 
     @Override

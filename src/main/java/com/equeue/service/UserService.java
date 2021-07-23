@@ -5,6 +5,7 @@ import com.equeue.entity.User;
 import com.equeue.repository.ProviderRepository;
 import com.equeue.repository.ScheduleRepository;
 import com.equeue.repository.SessionRepository;
+import com.equeue.entity.enumeration.UserRole;
 import com.equeue.repository.UserRepository;
 import com.equeue.telegram_bot.ButtonCommands;
 import com.equeue.telegram_bot.Commands;
@@ -63,16 +64,14 @@ public class UserService {
         if (findByName(name).getId() != null) {
             return "Пользователь c таким именем уже зарегистрировался!";
         }
-        if (findByTelegramId(message).getTelegramId() != null) {
-            return "Вы уже зарегистрированы!";
+        User currentUser = findByTelegramId(message);
+        if (currentUser.getUserRole() == UserRole.CLIENT) {
+            return "Вы уже были зарегистрированы ранее! \n" +
+                    "Ваше имя: " + currentUser.getName();
         }
 
-        User client = new User()
-                .setName(name)
-                .setRole("CLIENT")
-                .setTelegramId(message.getChatId())
-                .setZoneId(ZoneId.of(ZONE_ID_KYIV));
-        save(client);
+        currentUser.setName(name).setUserRole(UserRole.CLIENT);
+        save(currentUser);
         return "Поздравляю вы зарегистрировались!\n" +
                 "Ваше имя : " + name;
     }
@@ -113,9 +112,21 @@ public class UserService {
         return userRepository.findByName(name);
     }
 
-    private User findByTelegramId(Message message) {
+    public User findByTelegramId(Message message) {
         Long id = message.getChatId();
         return userRepository.findByTelegramId(id);
+    }
+
+    public void registerGuestUserIfNotExist(Message message) {
+        Long tgId = message.getFrom().getId();
+        if (userRepository.findByTelegramId(tgId) == null) {
+            String tgUsername = message.getFrom().getUserName();
+            userRepository.save(new User()
+                    .setName(tgUsername)
+                    .setUserRole(UserRole.GUEST)
+                    .setTelegramId(tgId)
+                    .setTelegramUsername(tgUsername));
+        }
     }
     public SendMessage askOrDeleteUser(Message message) {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();

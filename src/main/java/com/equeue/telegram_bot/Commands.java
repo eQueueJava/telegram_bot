@@ -6,6 +6,7 @@ import java.util.Map;
 public final class Commands {
     private Commands() {}
 
+    public static final String SHOW_CURRENT_USER_INFO = "/my_info";
     public static final String CREATE_CLIENT = "/reg";
     public static final String CREATE_PROVIDER = "/create_provider";
     public static final String CREATE_SCHEDULE = "/create_schedule";
@@ -18,6 +19,7 @@ public final class Commands {
     private static final Map<String, String> COMMAND_MAP = new LinkedHashMap<>();
 
     static {
+        COMMAND_MAP.put("SHOW_CURRENT_USER_INFO", SHOW_CURRENT_USER_INFO);
         COMMAND_MAP.put("ADD_CLIENT", CREATE_CLIENT);
         COMMAND_MAP.put("ADD_PROVIDER", CREATE_PROVIDER);
         COMMAND_MAP.put("ADD_SCHEDULE", CREATE_SCHEDULE);
