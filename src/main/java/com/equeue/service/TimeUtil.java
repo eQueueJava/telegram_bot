@@ -9,6 +9,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.ResolverStyle;
 import java.time.format.SignStyle;
@@ -91,6 +93,19 @@ public class TimeUtil {
     public static LocalDateTime utcDateTimeFromLocalDateTimeAndZone(LocalDateTime localDateTime, ZoneId zoneId) {
         return ZonedDateTime.of(localDateTime, zoneId)
                 .withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
+    }
+
+    public static List<LocalTime> getAllAvailableTime() {
+        LocalDateTime now = LocalDateTime.now();
+        return ZoneId.getAvailableZoneIds()
+                .stream()
+                .map(zoneId -> ZoneId.of(zoneId).getRules().getOffset(now))
+                .distinct()
+                .sorted(Comparator.reverseOrder())
+                .map(offset -> ZonedDateTime.of(now, ZoneId.of("UTC"))
+                        .withZoneSameInstant(ZoneId.of(offset.toString()))
+                        .toLocalTime())
+                .collect(Collectors.toList());
     }
 
 }

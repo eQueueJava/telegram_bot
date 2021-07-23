@@ -11,8 +11,13 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
+import java.util.Arrays;
+import java.util.List;
+
 @Service
 public class SendMessageService {
+
+    public static final String PARAM_DIVIDER = "__";
 
     @Autowired
     private MessageSender messageSender;
@@ -40,6 +45,9 @@ public class SendMessageService {
                 break;
             case Commands.CREATE_CLIENT:
                 messageSender.sendMessage(getSendMessage(message, userService.save(message)));
+                break;
+            case Commands.SET_CURRENT_USER_TIMEZONE:
+                messageSender.sendMessage(getSendMessage(message, userService.setCurrentUserTimezone(message)));
                 break;
             case Commands.CREATE_PROVIDER:
                 messageSender.sendMessage(getSendMessage(message, providerService.save(message)));
@@ -76,6 +84,11 @@ public class SendMessageService {
             command = messageText.substring(0, messageText.indexOf('\n'));
         } else {
             command = messageText;
+        }
+
+        if (command.lastIndexOf(PARAM_DIVIDER) > -1) {
+            String[] s = command.split(PARAM_DIVIDER);
+            command = s[0];
         }
         return command;
     }
