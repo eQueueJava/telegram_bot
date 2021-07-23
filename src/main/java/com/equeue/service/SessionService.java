@@ -15,9 +15,9 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -63,7 +63,6 @@ public class SessionService {
         String date = lines[4].trim();
         LocalDate dateFromString = TimeUtil.getDateFromString(date);
         String time = lines[5].trim();
-        LocalTime timeFromString = TimeUtil.getTimeFromString(time);
 
         User userById = userRepository.findById(userId);
         if (userById == null) {
@@ -80,12 +79,12 @@ public class SessionService {
             return "The provider has no schedule for this day!";
         }
 
-        LocalDateTime userDateTime = LocalDateTime.of(TimeUtil.localDateFromString(date), TimeUtil.localTimeFromString(time));
-        LocalDateTime utcDateTime = TimeUtil.utcDateTimeFromLocalDateTimeAndZone(userDateTime, userById.getZoneId());
+        LocalDateTime userDateTime = LocalDateTime.of(TimeUtil.getDateFromString(date), TimeUtil.getTimeFromString(time));
+        LocalDateTime utcDateTime = TimeUtil.getUtcDateTimeFromDateTimeAndZone(userDateTime, userById.getZoneId());
 
         List<Session> sessionsByProviderAndDate = sessionRepository.findByProviderAndDate(provId, dateFromString);
         for (Session session : sessionsByProviderAndDate) {
-            if (session.getSessionStart().toLocalTime().equals(utcDateTime)) {
+            if (session.getSessionStart().toLocalTime().equals(utcDateTime.toLocalTime())) {
                 if (session.getCustomer() != null) {
                     return "This session is already busy!";
                 }
@@ -96,7 +95,10 @@ public class SessionService {
                 String messageForProvider = "New record: @" + session.getCustomer().getTelegramUsername() +
                         "(t.me/" + session.getCustomer().getTelegramUsername() + ")" +
                         "\nProvider: " + session.getProvider().getName() +
-                        "\nSession: " + TimeUtil.getStringFromDateTime(session.getSessionStart());
+                        "\nSession: " + TimeUtil.getStringFromDateTime(
+                                TimeUtil.getDateTimeFromUtcDateTimeForZone(
+                                        session.getSessionStart(),
+                                        userRepository.findByTelegramId(message.getFrom().getId()).getZoneId()));
                 sendMessageService.sendTextTo(messageForProvider, session.getProvider().getClient().getTelegramId());
                 return "Success! Session added from " + date + " " + time;
             }
@@ -130,14 +132,17 @@ public class SessionService {
             if (sessions.isEmpty()) {
                 return "The provider has no schedule for this day: " + date + "!";
             }
-            addGeneratedSessions(sessions, dateFromString);
+            sessionRepository.saveAll(sessions);
         }
 
         List<Session> sessionByProviderAndDate = sessionRepository.findByProviderAndDate(providerId, dateFromString);
         StringBuilder res = new StringBuilder();
         for (Session session : sessionByProviderAndDate) {
             if (session.getCustomer() == null) {
-                res.append(TimeUtil.getStringFromTime(session.getSessionStart().toLocalTime())).append('\n');
+                res.append(TimeUtil.getStringFromTime(
+                        TimeUtil.getDateTimeFromUtcDateTimeForZone(
+                                session.getSessionStart(),
+                                userRepository.findByTelegramId(message.getFrom().getId()).getZoneId()).toLocalTime())).append('\n');
             }
         }
         return res.toString();

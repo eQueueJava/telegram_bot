@@ -65,4 +65,12 @@ public class SessionRepositoryImpl implements SessionRepository {
         return sessionMap.remove(id);
     }
 
+    @Override
+    public List<Session> saveAll(List<Session> sessions) {
+        List<Session> savedSessions = new ArrayList<>();
+        for (Session session : sessions) {
+            savedSessions.add(save(session));
+        }
+        return savedSessions;
+    }
 }

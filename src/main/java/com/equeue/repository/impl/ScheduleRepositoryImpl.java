@@ -7,7 +7,10 @@ import com.equeue.repository.ScheduleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -54,5 +57,4 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
     public Map<Integer, Schedule> deleteByProvider(Provider provider) {
         return scheduleMap.remove(provider.getId());
     }
-
 }

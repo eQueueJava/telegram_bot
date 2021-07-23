@@ -21,4 +21,6 @@ public interface SessionRepository {
     List<Session> deleteAllForProvider(Provider provider);
 
     Session deleteById(Long id);
+
+    List<Session> saveAll(List<Session> sessions);
 }

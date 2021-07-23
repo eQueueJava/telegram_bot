@@ -11,9 +11,6 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
-import java.util.Arrays;
-import java.util.List;
-
 @Service
 public class SendMessageService {
 

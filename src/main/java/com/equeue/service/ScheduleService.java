@@ -46,10 +46,10 @@ public class ScheduleService {
         schedule
                 .setProvider(providerRepository.findById(Long.valueOf(lines[1].replace("provider:", "").trim())))
                 .setDayOfWeek(Integer.valueOf(lines[2].replace("dayOfWeek:", "").trim()))
-                .setWorkStart(TimeUtil.utcTimeFromLocalTimeAndZone(
+                .setWorkStart(TimeUtil.getUtcTimeFromTimeAndZone(
                         TimeUtil.getTimeFromString(lines[3].replace("workStart:", "").trim()),
                         userRepository.findByTelegramId(message.getFrom().getId()).getZoneId()))
-                .setWorkFinish(TimeUtil.utcTimeFromLocalTimeAndZone(
+                .setWorkFinish(TimeUtil.getUtcTimeFromTimeAndZone(
                         TimeUtil.getTimeFromString(lines[4].replace("workFinish:", "").trim()),
                         userRepository.findByTelegramId(message.getFrom().getId()).getZoneId()))
                 .setDuration(Integer.valueOf(lines[5].replace("duration:", "").trim()));

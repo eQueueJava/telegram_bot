@@ -1,19 +1,14 @@
 package com.equeue.service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.chrono.IsoChronology;
-import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.*;
+import java.time.chrono.IsoChronology;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.stream.Collectors;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.ResolverStyle;
 import java.time.format.SignStyle;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.time.temporal.ChronoField.*;
 
@@ -75,22 +70,22 @@ public class TimeUtil {
         return localDateTime.format(DateTimeFormatter.ofPattern(DATE_TIME_PATTERN));
     }
 
-    public static LocalTime localTimeFromUtcTimeForZone(LocalTime localTime, ZoneId zoneId) {
+    public static LocalTime getTimeFromUtcTimeForZone(LocalTime localTime, ZoneId zoneId) {
         return ZonedDateTime.of(localTime.atDate(LocalDate.EPOCH), ZoneId.of("UTC"))
                 .withZoneSameInstant(zoneId).toLocalTime();
     }
 
-    static LocalTime utcTimeFromLocalTimeAndZone(LocalTime localTime, ZoneId zoneId) {
+    static LocalTime getUtcTimeFromTimeAndZone(LocalTime localTime, ZoneId zoneId) {
         return ZonedDateTime.of(localTime.atDate(LocalDate.EPOCH), zoneId).
                 withZoneSameInstant(ZoneOffset.UTC).toLocalTime();
     }
 
-    public static LocalDateTime localDateTimeFromUtcDateTimeForZone(LocalDateTime localDateTime, ZoneId zoneId) {
+    public static LocalDateTime getDateTimeFromUtcDateTimeForZone(LocalDateTime localDateTime, ZoneId zoneId) {
         return ZonedDateTime.of(localDateTime, ZoneId.of("UTC"))
                 .withZoneSameInstant(zoneId).toLocalDateTime();
     }
 
-    public static LocalDateTime utcDateTimeFromLocalDateTimeAndZone(LocalDateTime localDateTime, ZoneId zoneId) {
+    public static LocalDateTime getUtcDateTimeFromDateTimeAndZone(LocalDateTime localDateTime, ZoneId zoneId) {
         return ZonedDateTime.of(localDateTime, zoneId)
                 .withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
     }

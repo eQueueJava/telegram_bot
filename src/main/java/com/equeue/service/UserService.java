@@ -2,10 +2,10 @@ package com.equeue.service;
 
 import com.equeue.entity.Provider;
 import com.equeue.entity.User;
+import com.equeue.entity.enumeration.UserRole;
 import com.equeue.repository.ProviderRepository;
 import com.equeue.repository.ScheduleRepository;
 import com.equeue.repository.SessionRepository;
-import com.equeue.entity.enumeration.UserRole;
 import com.equeue.repository.UserRepository;
 import com.equeue.telegram_bot.ButtonCommands;
 import com.equeue.telegram_bot.Commands;
@@ -18,16 +18,16 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
     public static final String ZONE_ID_KYIV = "Europe/Kiev";
-    public static final String PARAM_DIVIDER = "__";
+    public static final ZoneId DEFAULT_ZONE = ZoneId.of(ZONE_ID_KYIV);
 
     @Autowired
     UserRepository userRepository;
@@ -50,7 +50,9 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public User deleteUser(Long id){return userRepository.deleteUser(id);}
+    public User deleteUser(Long id) {
+        return userRepository.deleteUser(id);
+    }
 
     public String save(Message message) {
         String messageText = message.getText();
@@ -75,12 +77,8 @@ public class UserService {
                     "Ваше имя: " + currentUser.getName();
         }
 
-        User client = new User()
-                .setName(name)
-                .setUserRole(UserRole.CLIENT)
-                .setTelegramId(message.getChatId())
-                .setZoneId(ZoneId.of(ZONE_ID_KYIV));
-        save(client);
+        currentUser.setName(name).setUserRole(UserRole.CLIENT);
+        save(currentUser);
         return "Поздравляю вы зарегистрировались!\n" +
                 "Ваше имя : " + name;
     }
@@ -88,17 +86,17 @@ public class UserService {
     public String deleteUser(Message message) {
         User user = findByTelegramId(message);
         Long id = user.getId();
-        if(id == null){
+        if (id == null) {
             return "Вы не зарегистрированы!";
         }
 
         List<Provider> providers = providerRepository.deleteAllProvidersForUser(user);
-        for (Provider provider: providers) {
+        for (Provider provider : providers) {
             sessionRepository.deleteAllForProvider(provider);
             scheduleRepository.deleteByProvider(provider);
         }
         deleteUser(id);
-            return "Поздравляю вы удалили все свои данные!";
+        return "Поздравляю вы удалили все свои данные!";
     }
 
     private boolean checkName(String name) {
@@ -114,7 +112,8 @@ public class UserService {
         }
 
         String[] lines = messageText.split("\n");
-        return userRepository.findById(Long.valueOf(lines[1].replace("clientId:", "").trim())).toString();
+        Long userId = Long.valueOf(lines[1].replace("clientId:", "").trim());
+        return userRepository.findById(userId).toString();
     }
 
     private User findByName(String name) {
@@ -122,7 +121,7 @@ public class UserService {
     }
 
     public User findByTelegramId(Message message) {
-        Long id = message.getChatId();
+        Long id = message.getFrom().getId();
         return userRepository.findByTelegramId(id);
     }
 
@@ -134,9 +133,11 @@ public class UserService {
                     .setName(tgUsername)
                     .setUserRole(UserRole.GUEST)
                     .setTelegramId(tgId)
+                    .setZoneId(DEFAULT_ZONE)
                     .setTelegramUsername(tgUsername));
         }
     }
+
     public SendMessage askOrDeleteUser(Message message) {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
 
@@ -164,19 +165,19 @@ public class UserService {
 
     public String setCurrentUserTimezone(Message message) {
         String messageText = message.getText();
-        String[] params = getParams(messageText);
+        String[] params = HelperService.getParams(messageText);
         if (params.length == 0) {
             List<LocalTime> allAvailableTime = TimeUtil.getAllAvailableTime();
             return allAvailableTime.stream()
                     .map(t -> t.format(DateTimeFormatter.ofPattern(TimeUtil.TIME_PATTERN)))
-                    .map(s -> Commands.SET_CURRENT_USER_TIMEZONE + PARAM_DIVIDER + s.replace(":","_"))
+                    .map(s -> Commands.SET_CURRENT_USER_TIMEZONE + HelperService.PARAM_DIVIDER + s.replace(":", "_"))
                     .collect(Collectors.joining("\n"));
         }
         if (params[0].matches("\\d?\\d_\\d\\d")) {
             String timeString = params[0].replace("_", ":");
 
             LocalDateTime now = LocalDateTime.now();
-            LocalDateTime userLocalDateTime = LocalDateTime.of(now.toLocalDate(),LocalTime.parse(timeString,DateTimeFormatter.ofPattern(TimeUtil.TIME_PATTERN)));
+            LocalDateTime userLocalDateTime = LocalDateTime.of(now.toLocalDate(), LocalTime.parse(timeString, DateTimeFormatter.ofPattern(TimeUtil.TIME_PATTERN)));
             Set<ZoneId> zones = new HashSet<>();
             for (String id : ZoneId.getAvailableZoneIds()) {
                 ZoneId zone = ZoneId.of(id);
@@ -188,7 +189,7 @@ public class UserService {
             return zones.stream()
                     .map(ZoneId::toString)
                     .sorted()
-                    .map(z-> Commands.SET_CURRENT_USER_TIMEZONE + PARAM_DIVIDER + z.replace("/","_"))
+                    .map(z -> Commands.SET_CURRENT_USER_TIMEZONE + HelperService.PARAM_DIVIDER + z.replace("/", "_"))
                     .collect(Collectors.joining("\n"));
         }
         String zone = params[0].replace("_", "/");
@@ -199,11 +200,6 @@ public class UserService {
             return "FAIL";
         }
         return "OK";
-    }
-
-    private String[] getParams(String command) {
-        String[] strings = command.split("__");
-        return Arrays.copyOfRange(strings, 1, strings.length);
     }
 
 }
