@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Repository
@@ -23,7 +24,7 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
     }
 
     //long->providerId
-    private static Map<Long, Map<Integer, Schedule>> scheduleMap = new HashMap<>();
+    private static Map<Long, Map<Integer, Schedule>> scheduleMap = new ConcurrentHashMap<>();
 
     public static void setScheduleMap(Map<Long, Map<Integer, Schedule>> scheduleMap) {
         ScheduleRepositoryImpl.scheduleMap = scheduleMap;
@@ -79,15 +80,8 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
     }
 
     @Override
-    public Map<Integer, Schedule> deleteAllForProvider(Provider provider) {
-//        Map<Long, Map<Integer, Schedule>> scheduleMap
-        Map<Integer, Schedule> schedules = new HashMap<>();
-        for (Map.Entry<Long, Map<Integer, Schedule>> entry: scheduleMap.entrySet()) {
-            if(entry.getKey().equals(provider.getId())){
-                schedules = scheduleMap.remove(provider.getId());
-            }
-        }
-        return schedules;
+    public Map<Integer, Schedule> deleteByProvider(Provider provider) {
+        return scheduleMap.remove(provider.getId());
     }
 
     private String generateTime(double i, double duration) {

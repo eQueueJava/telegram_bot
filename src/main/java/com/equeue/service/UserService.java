@@ -87,7 +87,7 @@ public class UserService {
         List<Provider> providers = providerRepository.deleteAllProvidersForUser(user);
         for (Provider provider: providers) {
             sessionRepository.deleteAllForProvider(provider);
-            scheduleRepository.deleteAllForProvider(provider);
+            scheduleRepository.deleteByProvider(provider);
         }
         deleteUser(id);
             return "Поздравляю вы удалили все свои данные!";
