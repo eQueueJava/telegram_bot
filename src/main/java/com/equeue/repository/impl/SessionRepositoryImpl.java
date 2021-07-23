@@ -1,5 +1,6 @@
 package com.equeue.repository.impl;
 
+import com.equeue.entity.Provider;
 import com.equeue.entity.Session;
 import com.equeue.repository.SessionRepository;
 import org.springframework.stereotype.Repository;
@@ -14,8 +15,8 @@ import java.util.stream.Collectors;
 @Repository
 public class SessionRepositoryImpl implements SessionRepository {
 
-    Map<Long, Session> sessionMap = new HashMap<>();
-    Long id = 1L;
+    private static final Map<Long, Session> sessionMap = new HashMap<>();
+    private Long id = 1L;
 
     @Override
     public Session save(Session session) {
@@ -47,6 +48,21 @@ public class SessionRepositoryImpl implements SessionRepository {
                 .filter(s -> s.getProvider().getId().equals(providerId))
                 .filter(s -> s.getSessionStart().toLocalDate().equals(date))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Session> deleteAllForProvider(Provider provider) {
+        List<Session> sessionsDeleted = new ArrayList<>();
+        List<Session> sessionsForDel = findByProvider(provider.getId());
+        for (Session sessionForDel : sessionsForDel) {
+            sessionsDeleted.add(deleteById(sessionForDel.getId()));
+        }
+        return sessionsDeleted;
+    }
+
+    @Override
+    public Session deleteById(Long id) {
+        return sessionMap.remove(id);
     }
 
 }

@@ -1,5 +1,6 @@
 package com.equeue.repository;
 
+import com.equeue.entity.Provider;
 import com.equeue.entity.Session;
 
 import java.time.LocalDate;
@@ -17,4 +18,7 @@ public interface SessionRepository {
 
     List<Session> findByProviderAndDate(Long providerId, LocalDate date);
 
+    List<Session> deleteAllForProvider(Provider provider);
+
+    Session deleteById(Long id);
 }

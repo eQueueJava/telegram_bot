@@ -1,5 +1,6 @@
 package com.equeue.repository.impl;
 
+import com.equeue.entity.Provider;
 import com.equeue.entity.Schedule;
 import com.equeue.repository.ProviderRepository;
 import com.equeue.repository.ScheduleRepository;
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Repository
@@ -15,7 +17,12 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
     @Autowired
     ProviderRepository providerRepository;
 
-    Map<Long, Map<Integer, Schedule>> scheduleMap = new HashMap<>();
+    //long->providerId
+    private static Map<Long, Map<Integer, Schedule>> scheduleMap = new ConcurrentHashMap<>();
+
+    public static void setScheduleMap(Map<Long, Map<Integer, Schedule>> scheduleMap) {
+        ScheduleRepositoryImpl.scheduleMap = scheduleMap;
+    }
 
     @Override
     public Schedule save(Schedule schedule) {
@@ -41,6 +48,11 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
     @Override
     public Schedule findByProviderAndDayOfWeek(Long providerId, Integer dayOfWeek) {
         return scheduleMap.get(providerId).get(dayOfWeek);
+    }
+
+    @Override
+    public Map<Integer, Schedule> deleteByProvider(Provider provider) {
+        return scheduleMap.remove(provider.getId());
     }
 
 }

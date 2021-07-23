@@ -1,5 +1,6 @@
 package com.equeue.telegram_bot;
 
+import com.equeue.telegram_bot.services.ButtonProcessingService;
 import com.equeue.telegram_bot.services.SendMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,10 +18,16 @@ public class EQueueBot extends TelegramLongPollingBot {
     private String token;
 
     private SendMessageService sendMessageService;
+    private ButtonProcessingService buttonProcessingService;
 
     @Autowired
     public void setSendMessageService(SendMessageService sendMessageService) {
         this.sendMessageService = sendMessageService;
+    }
+
+    @Autowired
+    public void setButtonProcessingService(ButtonProcessingService buttonProcessingService) {
+        this.buttonProcessingService = buttonProcessingService;
     }
 
     @Override
@@ -35,6 +42,12 @@ public class EQueueBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
+        if(update.hasCallbackQuery()){
+            var callbackQuery = update.getCallbackQuery();
+            if(callbackQuery.getData() != null){
+                buttonProcessingService.distribution(callbackQuery);
+            }
+        }
         if (update.hasMessage()) {
             var message = update.getMessage();
             if (message.hasText()) {

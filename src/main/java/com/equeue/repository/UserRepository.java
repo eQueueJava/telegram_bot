@@ -17,4 +17,6 @@ public interface UserRepository {
     User findByName(String name);
 
     User findByTelegramId(Long id);
+
+    User deleteUser(Long id);
 }
