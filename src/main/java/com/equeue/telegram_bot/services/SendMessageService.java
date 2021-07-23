@@ -59,6 +59,9 @@ public class SendMessageService {
             case Commands.INPUT_TIME:
                 messageSender.sendMessage(getSendMessage(message, sessionService.selectSession(message)));
                 break;
+            case Commands.DELETE_CLIENT:
+                messageSender.sendMessage(userService.askOrDeleteUser(message));
+                break;
             default:
                 messageSender.sendMessage(defaultMessage(message));
         }
@@ -89,7 +92,7 @@ public class SendMessageService {
 
     private SendMessage defaultMessage(Message message) {
         return SendMessage.builder()
-                .text("Не вірна команда!")
+                .text("Неизвестная команда!")
                 .chatId(String.valueOf(message.getChatId()))
                 .build();
     }

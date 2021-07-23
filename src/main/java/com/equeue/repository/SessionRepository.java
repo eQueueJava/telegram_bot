@@ -1,5 +1,6 @@
 package com.equeue.repository;
 
+import com.equeue.entity.Provider;
 import com.equeue.entity.Session;
 
 import java.util.List;
@@ -17,4 +18,7 @@ public interface SessionRepository {
 
     Map<Long, Session> findSessionByProviderOfDate(long providerId, String date);
 
+    List<Session> deleteAllForProvider(Provider provider);
+
+    Session deleteById(Long id);
 }

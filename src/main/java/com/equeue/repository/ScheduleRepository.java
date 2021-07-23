@@ -1,8 +1,10 @@
 package com.equeue.repository;
 
+import com.equeue.entity.Provider;
 import com.equeue.entity.Schedule;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ScheduleRepository {
 
@@ -18,4 +20,5 @@ public interface ScheduleRepository {
 
     List<String> generateTemplate(Schedule schedule);
 
+    Map<Integer, Schedule> deleteByProvider(Provider provider);
 }
