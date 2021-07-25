@@ -97,7 +97,9 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(id, user.id) && Objects.equals(name, user.name) && Objects.equals(userRole, user.userRole) && Objects.equals(telegramId, user.telegramId) && Objects.equals(providers, user.providers) && Objects.equals(sessions, user.sessions);
+        return Objects.equals(id, user.id) && Objects.equals(name, user.name)
+                && Objects.equals(userRole, user.userRole) && Objects.equals(telegramId, user.telegramId)
+                && Objects.equals(providers, user.providers) && Objects.equals(sessions, user.sessions);
     }
 
     @Override
@@ -107,24 +109,27 @@ public class User {
 
     @Override
     public String toString() {
-        return "User { " +
-                "id=" + id + ", \n" +
-                "name='" + name + "', \n" +
-                "userRole='" + userRole + "', \n" +
-                "telegramId=" + telegramId + ", \n" +
-                "telegramUsername=" + telegramUsername + ", \n" +
-                "timeZone=" + zoneId +  ", \n" +
-                "providers=" + "\n\t" +
-                (providers == null || providers.isEmpty() ? "none" : providers.stream()
-                        .map(p -> "'" + p.getName() + "' (" + p.getId() + ")")
-                        .collect(Collectors.joining(", \n\t"))) + ", \n" +
-                "sessions=" + "\n\t" +
-                (sessions == null || sessions.isEmpty() ? "none" : sessions.stream()
-                        .map(s -> s.getProvider().getId() + ": " +
-                                TimeUtil.getStringFromDateTime(s.getSessionStart())
-                        )
-                        .collect(Collectors.joining(", \n\t"))) +
-                " }";
-    }
+        String idText = "Ваш ID - " + id + ", \n";
+        String nameText = "Ваше имя - '" + name + "', \n";
+        String userRoleText = "Вы зарегистрированы как - '" + userRole + "', \n";
+        String timeZone = "Ваш часовой пояс - " + zoneId + ", \n";
 
+        String result = idText + nameText + userRoleText + timeZone;
+
+        if (!providers.isEmpty()) {
+            result += "Ваши заведения : " + providers.stream()
+                    .map(p -> "'" + p.getName() + "' ( Id заведения - " + p.getId() + ")")
+                    .collect(Collectors.joining(", \n\t")) + ", \n";
+        }
+
+        if (!sessions.isEmpty()) {
+            result += "К вам записаны : " + sessions.stream()
+                    .map(s -> s.getProvider().getName() + ": " +
+                            TimeUtil.getStringFromDateTime(s.getSessionStart())
+                    )
+                    .collect(Collectors.joining(", \n\t"));
+        }
+
+        return result;
+    }
 }

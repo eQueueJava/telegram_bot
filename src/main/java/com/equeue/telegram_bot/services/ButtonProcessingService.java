@@ -1,6 +1,7 @@
 package com.equeue.telegram_bot.services;
 
 import com.equeue.service.UserService;
+import com.equeue.telegram_bot.ButtonCommands;
 import com.equeue.telegram_bot.messagesender.MessageSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,11 +22,13 @@ public class ButtonProcessingService {
         Message message = callbackQuery.getMessage();
 
         switch (command){
-            case "/button_delete_yes":
+            case ButtonCommands.DELETE_CLIENT_YES:
                 messageSender.sendMessage(getSendMessage(message, userService.deleteUser(message)));
                 break;
-            case "/button_delete_no":
+            case ButtonCommands.DELETE_CLIENT_NO:
                 messageSender.deleteMessage(deleteMessage(message));
+                break;
+            case ButtonCommands.SET_TIMEZONE:
                 break;
             default:
                 messageSender.sendMessage(getSendMessage(message, "Неизвестная кнопка!"));

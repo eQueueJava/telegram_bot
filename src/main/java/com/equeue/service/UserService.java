@@ -96,7 +96,7 @@ public class UserService {
             scheduleRepository.deleteByProvider(provider);
         }
         deleteUser(id);
-        return "Поздравляю вы удалили все свои данные!";
+        return "Вы удалили все свои данные!";
     }
 
     private boolean checkName(String name) {
@@ -164,42 +164,79 @@ public class UserService {
     }
 
     public String setCurrentUserTimezone(Message message) {
-        String messageText = message.getText();
-        String[] params = HelperService.getParams(messageText);
-        if (params.length == 0) {
-            List<LocalTime> allAvailableTime = TimeUtil.getAllAvailableTime();
-            return allAvailableTime.stream()
-                    .map(t -> t.format(DateTimeFormatter.ofPattern(TimeUtil.TIME_PATTERN)))
-                    .map(s -> Commands.SET_CURRENT_USER_TIMEZONE + HelperService.PARAM_DIVIDER + s.replace(":", "_"))
-                    .collect(Collectors.joining("\n"));
-        }
-        if (params[0].matches("\\d?\\d_\\d\\d")) {
-            String timeString = params[0].replace("_", ":");
+//        String messageText = message.getText();
+//        String[] params = HelperService.getParams(messageText);
+//        //return buttons
+//        if (params.length == 0) {
+//            List<LocalTime> allAvailableTime = TimeUtil.getAllAvailableTime();
+//            return allAvailableTime.stream()
+//                    .map(t -> t.format(DateTimeFormatter.ofPattern(TimeUtil.TIME_PATTERN)))
+//                    .map(s -> Commands.SET_CURRENT_USER_TIMEZONE + HelperService.PARAM_DIVIDER + s.replace(":", "_"))
+//                    .collect(Collectors.joining("\n"));
+//        }
+//        if (params[0].matches("\\d?\\d_\\d\\d")) {
+//            String timeString = params[0].replace("_", ":");
+//
+//            LocalDateTime now = LocalDateTime.now();
+//            LocalDateTime userLocalDateTime = LocalDateTime.of(now.toLocalDate(), LocalTime.parse(timeString, DateTimeFormatter.ofPattern(TimeUtil.TIME_PATTERN)));
+//            Set<ZoneId> zones = new HashSet<>();
+//            for (String id : ZoneId.getAvailableZoneIds()) {
+//                ZoneId zone = ZoneId.of(id);
+//                ZoneOffset offset = zone.getRules().getOffset(now);
+//                if (Math.abs(userLocalDateTime.toInstant(ZoneOffset.UTC).getEpochSecond() - Instant.now().getEpochSecond() - offset.getTotalSeconds()) < 600) {
+//                    zones.add(zone);
+//                }
+//            }
+//            return zones.stream()
+//                    .map(ZoneId::toString)
+//                    .sorted()
+//                    .map(z -> Commands.SET_CURRENT_USER_TIMEZONE + HelperService.PARAM_DIVIDER + z.replace("/", "_"))
+//                    .collect(Collectors.joining("\n"));
+//        }
+//        String zone = params[0].replace("_", "/");
+//        try {
+//            User byId = userRepository.findByTelegramId(message.getChatId());
+//            byId.setZoneId(ZoneId.of(zone));
+//        } catch (Exception e) {
+//            return "FAIL";
+//        }
+//        return "OK";
+        List<LocalTime> allAvailableTime = TimeUtil.getAllAvailableTime();
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        List<InlineKeyboardButton> keyboardButtonList = new ArrayList<>();
+        List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
+        int iconInRow = 4;
+        int listSize = allAvailableTime.size();
 
-            LocalDateTime now = LocalDateTime.now();
-            LocalDateTime userLocalDateTime = LocalDateTime.of(now.toLocalDate(), LocalTime.parse(timeString, DateTimeFormatter.ofPattern(TimeUtil.TIME_PATTERN)));
-            Set<ZoneId> zones = new HashSet<>();
-            for (String id : ZoneId.getAvailableZoneIds()) {
-                ZoneId zone = ZoneId.of(id);
-                ZoneOffset offset = zone.getRules().getOffset(now);
-                if (Math.abs(userLocalDateTime.toInstant(ZoneOffset.UTC).getEpochSecond() - Instant.now().getEpochSecond() - offset.getTotalSeconds()) < 600) {
-                    zones.add(zone);
-                }
-            }
-            return zones.stream()
-                    .map(ZoneId::toString)
-                    .sorted()
-                    .map(z -> Commands.SET_CURRENT_USER_TIMEZONE + HelperService.PARAM_DIVIDER + z.replace("/", "_"))
-                    .collect(Collectors.joining("\n"));
+//        for (int i = 0; i < listSize; i++) {
+
+//            for (int j = 0; j < iconInRow; j++) {
+//
+//
+//                i++;
+//            }
+        for (LocalTime time: allAvailableTime) {
+            InlineKeyboardButton button = new InlineKeyboardButton();
+            button.setText(time.toString());
+            button.setCallbackData(ButtonCommands.SET_TIMEZONE + "__" + time.toString());
+            keyboardButtonList.add(button);
         }
-        String zone = params[0].replace("_", "/");
-        try {
-            User byId = userRepository.findByTelegramId(message.getChatId());
-            byId.setZoneId(ZoneId.of(zone));
-        } catch (Exception e) {
-            return "FAIL";
-        }
-        return "OK";
+        rowList.add(keyboardButtonList);
+
+
+        inlineKeyboardMarkup.setKeyboard(rowList);
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(String.valueOf(message.getChatId()));
+        sendMessage.setText("Какое у вас сейчас время?");
+        sendMessage.setReplyMarkup(inlineKeyboardMarkup);
+
+        return ";";
+//        return allAvailableTime.stream()
+//                .map(t -> t.format(DateTimeFormatter.ofPattern(TimeUtil.TIME_PATTERN)))
+//                .map(s -> Commands.SET_CURRENT_USER_TIMEZONE + HelperService.PARAM_DIVIDER + s.replace(":", "_"))
+//                .collect(Collectors.joining("\n"));
+//        return sendMessage;
+
     }
-
 }
