@@ -44,7 +44,7 @@ public class SendMessageService {
                 messageSender.sendMessage(getSendMessage(message, userService.save(message)));
                 break;
             case Commands.SET_CURRENT_USER_TIMEZONE:
-                messageSender.sendMessage(getSendMessage(message, userService.setCurrentUserTimezone(message)));
+                messageSender.sendMessage(userService.askCurrentUserTime(message));
                 break;
             case Commands.CREATE_PROVIDER:
                 messageSender.sendMessage(getSendMessage(message, providerService.save(message)));

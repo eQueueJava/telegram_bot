@@ -9,8 +9,8 @@ public class HelperService {
         throw new IllegalStateException("Utility class");
     }
 
-    static String[] getParams(String command) {
-        String[] strings = command.split("__");
-        return Arrays.copyOfRange(strings, 1, strings.length);
+    public static String[] getParams(String command) {
+        String[] strings = command.split(PARAM_DIVIDER);
+        return Arrays.copyOfRange(strings, 0, strings.length);
     }
 }

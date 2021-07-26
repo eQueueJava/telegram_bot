@@ -66,20 +66,21 @@ public class Provider {
 
     @Override
     public String toString() {
-        return "Provider { " +
-                "id=" + id + ", \n" +
-                "name='" + name + "'" + ", \n" +
-                "client='" + client.getName() + "' (" + client.getId() + ")" + ", \n" +
-                "schedules=" + " \n\t" +
-                (scheduleMap == null || scheduleMap.size() == 0 ? "none" : scheduleMap.values().stream()
+        String idText = "ID услуги - " + id + " \n";
+        String nameText = "Название услуги - '" + name + "' \n";
+        String clientText = "Владелиц - " + client.getName() + "' (ID владельца - " + client.getId() + ")" + " \n";
+        String result = idText + nameText + clientText;
+        if(scheduleMap.size() != 0){
+            String scheduleText = "График работы : \n" + scheduleMap.values().stream()
                         .map(s -> DayOfWeek.of(s.getDayOfWeek()) + ":\t" +
                                 TimeUtil.getStringFromTime(
                                         TimeUtil.getTimeFromUtcTimeForZone(s.getWorkStart(), client.getZoneId())) + "-" +
                                 TimeUtil.getStringFromTime(
                                         TimeUtil.getTimeFromUtcTimeForZone(s.getWorkFinish(), client.getZoneId())) +
-                                " (" + s.getDuration() + "min)")
-                        .collect(Collectors.joining(", \n\t"))) +
-                " }";
+                                " (длительность процедуры - " + s.getDuration() + " минут)")
+                        .collect(Collectors.joining(", \n\t"));
+            result += scheduleText;
+        }
+        return result;
     }
-
 }

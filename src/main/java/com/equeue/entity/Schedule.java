@@ -74,14 +74,14 @@ public class Schedule {
 
     @Override
     public String toString() {
-        return "Schedule {" + " \n" +
-                "provider=" + provider.getName() + "' (" + provider.getId() + ")" + ", \n" +
-                "dayOfWeek=" + DayOfWeek.of(dayOfWeek) + ", \n" +
-                "workStart=" + TimeUtil.getStringFromTime(
-                        TimeUtil.getTimeFromUtcTimeForZone(workStart, provider.getClient().getZoneId())) + ", \n" +
-                "workFinish=" + TimeUtil.getStringFromTime(
-                        TimeUtil.getTimeFromUtcTimeForZone(workFinish, provider.getClient().getZoneId())) + ", \n" +
-                "duration=" + duration +
-                " }";
+        String providerText = "Расписание для - " + provider.getName() + " (ID услуги - " + provider.getId() + ")\n";
+        String dayOfWeekText = "День недели - " + DayOfWeek.of(dayOfWeek) + "\n";
+        String workStartText = "Начало работы - " + TimeUtil.getStringFromTime(
+                        TimeUtil.getTimeFromUtcTimeForZone(workStart, provider.getClient().getZoneId())) + "\n";
+        String workFinishText = "Конец работы - " + TimeUtil.getStringFromTime(
+                        TimeUtil.getTimeFromUtcTimeForZone(workFinish, provider.getClient().getZoneId())) + "\n";
+        String durationText = "Продолжительность услуги - " + duration + " минут";
+
+        return providerText + dayOfWeekText + workStartText + workFinishText + durationText;
     }
 }

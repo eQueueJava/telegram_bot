@@ -18,16 +18,11 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 public class UserService {
-    public static final String ZONE_ID_KYIV = "Europe/Kiev";
-    public static final ZoneId DEFAULT_ZONE = ZoneId.of(ZONE_ID_KYIV);
+    public static final ZoneId DEFAULT_ZONE = ZoneId.of("Europe/Kiev");
 
     @Autowired
     UserRepository userRepository;
@@ -142,9 +137,9 @@ public class UserService {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
 
         InlineKeyboardButton buttonYes = new InlineKeyboardButton();
-        InlineKeyboardButton buttonNo = new InlineKeyboardButton();
         buttonYes.setText("Да!");
         buttonYes.setCallbackData(ButtonCommands.DELETE_CLIENT_YES);
+        InlineKeyboardButton buttonNo = new InlineKeyboardButton();
         buttonNo.setText("Нет!");
         buttonNo.setCallbackData(ButtonCommands.DELETE_CLIENT_NO);
 
@@ -163,80 +158,90 @@ public class UserService {
         return sendMessage;
     }
 
-    public String setCurrentUserTimezone(Message message) {
-//        String messageText = message.getText();
-//        String[] params = HelperService.getParams(messageText);
-//        //return buttons
-//        if (params.length == 0) {
-//            List<LocalTime> allAvailableTime = TimeUtil.getAllAvailableTime();
-//            return allAvailableTime.stream()
-//                    .map(t -> t.format(DateTimeFormatter.ofPattern(TimeUtil.TIME_PATTERN)))
-//                    .map(s -> Commands.SET_CURRENT_USER_TIMEZONE + HelperService.PARAM_DIVIDER + s.replace(":", "_"))
-//                    .collect(Collectors.joining("\n"));
-//        }
-//        if (params[0].matches("\\d?\\d_\\d\\d")) {
-//            String timeString = params[0].replace("_", ":");
-//
-//            LocalDateTime now = LocalDateTime.now();
-//            LocalDateTime userLocalDateTime = LocalDateTime.of(now.toLocalDate(), LocalTime.parse(timeString, DateTimeFormatter.ofPattern(TimeUtil.TIME_PATTERN)));
-//            Set<ZoneId> zones = new HashSet<>();
-//            for (String id : ZoneId.getAvailableZoneIds()) {
-//                ZoneId zone = ZoneId.of(id);
-//                ZoneOffset offset = zone.getRules().getOffset(now);
-//                if (Math.abs(userLocalDateTime.toInstant(ZoneOffset.UTC).getEpochSecond() - Instant.now().getEpochSecond() - offset.getTotalSeconds()) < 600) {
-//                    zones.add(zone);
-//                }
-//            }
-//            return zones.stream()
-//                    .map(ZoneId::toString)
-//                    .sorted()
-//                    .map(z -> Commands.SET_CURRENT_USER_TIMEZONE + HelperService.PARAM_DIVIDER + z.replace("/", "_"))
-//                    .collect(Collectors.joining("\n"));
-//        }
-//        String zone = params[0].replace("_", "/");
-//        try {
-//            User byId = userRepository.findByTelegramId(message.getChatId());
-//            byId.setZoneId(ZoneId.of(zone));
-//        } catch (Exception e) {
-//            return "FAIL";
-//        }
-//        return "OK";
+    public SendMessage askCurrentUserTime(Message message) {
         List<LocalTime> allAvailableTime = TimeUtil.getAllAvailableTime();
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         List<InlineKeyboardButton> keyboardButtonList = new ArrayList<>();
         List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
-        int iconInRow = 4;
-        int listSize = allAvailableTime.size();
-
-//        for (int i = 0; i < listSize; i++) {
-
-//            for (int j = 0; j < iconInRow; j++) {
-//
-//
-//                i++;
-//            }
+        int iconInRow = 3;
         for (LocalTime time: allAvailableTime) {
             InlineKeyboardButton button = new InlineKeyboardButton();
-            button.setText(time.toString());
-            button.setCallbackData(ButtonCommands.SET_TIMEZONE + "__" + time.toString());
+            button.setText(time.format(DateTimeFormatter.ofPattern(TimeUtil.TIME_PATTERN)));
+            button.setCallbackData(ButtonCommands.SET_TIME + HelperService.PARAM_DIVIDER +
+                    time.format(DateTimeFormatter.ofPattern(TimeUtil.TIME_PATTERN)));
             keyboardButtonList.add(button);
+            if(keyboardButtonList.size() == iconInRow){
+                rowList.add(keyboardButtonList);
+                keyboardButtonList = new ArrayList<>();
+            }
         }
-        rowList.add(keyboardButtonList);
-
-
+        InlineKeyboardButton buttonCancel = new InlineKeyboardButton();
+        buttonCancel.setText("Отмена!");
+        buttonCancel.setCallbackData(ButtonCommands.SET_TIME + HelperService.PARAM_DIVIDER + ButtonCommands.CANCEL);
+        keyboardButtonList.add(buttonCancel);
+        if(!keyboardButtonList.isEmpty()){
+            rowList.add(keyboardButtonList);
+        }
         inlineKeyboardMarkup.setKeyboard(rowList);
-
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(String.valueOf(message.getChatId()));
         sendMessage.setText("Какое у вас сейчас время?");
         sendMessage.setReplyMarkup(inlineKeyboardMarkup);
 
-        return ";";
-//        return allAvailableTime.stream()
-//                .map(t -> t.format(DateTimeFormatter.ofPattern(TimeUtil.TIME_PATTERN)))
-//                .map(s -> Commands.SET_CURRENT_USER_TIMEZONE + HelperService.PARAM_DIVIDER + s.replace(":", "_"))
-//                .collect(Collectors.joining("\n"));
-//        return sendMessage;
+        return sendMessage;
+    }
 
+    public SendMessage askCurrentUserTimezone(Message message, String timeString) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime userLocalDateTime = LocalDateTime.of(now.toLocalDate(), LocalTime.parse
+                (timeString, DateTimeFormatter.ofPattern(TimeUtil.TIME_PATTERN)));
+        Set<String> zones = new TreeSet<>();
+        for (String id : ZoneId.getAvailableZoneIds()) {
+            ZoneId zone = ZoneId.of(id);
+            ZoneOffset offset = zone.getRules().getOffset(now);
+            if (Math.abs(userLocalDateTime.toInstant(ZoneOffset.UTC).
+                    getEpochSecond() - Instant.now().getEpochSecond() - offset.getTotalSeconds()) < 600) {
+                zones.add(zone.toString());
+            }
+        }
+
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        List<InlineKeyboardButton> keyboardButtonList = new ArrayList<>();
+        List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
+        int iconInRow = 2;
+        for (String zone: zones) {
+            InlineKeyboardButton button = new InlineKeyboardButton();
+            button.setText(zone);
+            button.setCallbackData(ButtonCommands.SET_TIMEZONE + HelperService.PARAM_DIVIDER + zone);
+            keyboardButtonList.add(button);
+            if(keyboardButtonList.size() == iconInRow){
+                rowList.add(keyboardButtonList);
+                keyboardButtonList = new ArrayList<>();
+            }
+        }
+        InlineKeyboardButton buttonCancel = new InlineKeyboardButton();
+        buttonCancel.setText("Отмена!");
+        buttonCancel.setCallbackData(ButtonCommands.SET_TIMEZONE + HelperService.PARAM_DIVIDER + ButtonCommands.CANCEL);
+        keyboardButtonList.add(buttonCancel);
+        if(!keyboardButtonList.isEmpty()){
+            rowList.add(keyboardButtonList);
+        }
+        inlineKeyboardMarkup.setKeyboard(rowList);
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(String.valueOf(message.getChatId()));
+        sendMessage.setText("Какой у вас часовой пояс?");
+        sendMessage.setReplyMarkup(inlineKeyboardMarkup);
+
+        return sendMessage;
+    }
+
+    public String setCurrentUserTimezone(Message message, String zone){
+        try {
+            User byId = userRepository.findByTelegramId(message.getChatId());
+            byId.setZoneId(ZoneId.of(zone));
+        } catch (Exception e) {
+            return "FAIL";
+        }
+        return "OK";
     }
 }

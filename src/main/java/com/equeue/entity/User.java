@@ -109,10 +109,10 @@ public class User {
 
     @Override
     public String toString() {
-        String idText = "Ваш ID - " + id + ", \n";
-        String nameText = "Ваше имя - '" + name + "', \n";
-        String userRoleText = "Вы зарегистрированы как - '" + userRole + "', \n";
-        String timeZone = "Ваш часовой пояс - " + zoneId + ", \n";
+        String idText = "Ваш ID - " + id + " \n";
+        String nameText = "Ваше имя - '" + name + "' \n";
+        String userRoleText = "Вы зарегистрированы как - '" + userRole + "' \n";
+        String timeZone = "Ваш часовой пояс - " + zoneId + " \n";
 
         String result = idText + nameText + userRoleText + timeZone;
 
@@ -127,7 +127,7 @@ public class User {
                     .map(s -> s.getProvider().getName() + ": " +
                             TimeUtil.getStringFromDateTime(s.getSessionStart())
                     )
-                    .collect(Collectors.joining(", \n\t"));
+                    .collect(Collectors.joining(" \n\t"));
         }
 
         return result;

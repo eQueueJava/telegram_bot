@@ -145,7 +145,7 @@ public class SessionService {
                                 userRepository.findByTelegramId(message.getFrom().getId()).getZoneId()).toLocalTime())).append('\n');
             }
         }
-        return res.toString();
+        return "Рассписание \n Для " + providerRepository.findById(providerId).getName() + "\n" + date + "\n" + res;
     }
 
     private List<Session> getSessions(long providerId, LocalDate date) {
