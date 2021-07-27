@@ -116,7 +116,7 @@ public class UserService {
     }
 
     public User findByTelegramId(Message message) {
-        Long id = message.getFrom().getId();
+        Long id = message.getChatId();
         return userRepository.findByTelegramId(id);
     }
 
@@ -160,6 +160,7 @@ public class UserService {
 
     public SendMessage askCurrentUserTime(Message message) {
         List<LocalTime> allAvailableTime = TimeUtil.getAllAvailableTime();
+        Collections.sort(allAvailableTime);
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         List<InlineKeyboardButton> keyboardButtonList = new ArrayList<>();
         List<List<InlineKeyboardButton>> rowList = new ArrayList<>();

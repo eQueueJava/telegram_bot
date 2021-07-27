@@ -58,12 +58,12 @@ public class SendMessageService {
             case Commands.READ_PROVIDER:
                 messageSender.sendMessage(getSendMessage(message, providerService.findById(message)));
                 break;
-            case Commands.GET_FREE_TIME:
-                messageSender.sendMessage(getSendMessage(message, sessionService.saveSession(message)));
+            case Commands.SET_FREE_TIME:
+                messageSender.sendMessage(sessionService.saveSession(message));
                 break;
-            case Commands.INPUT_TIME:
-                messageSender.sendMessage(getSendMessage(message, sessionService.selectSession(message)));
-                break;
+//            case Commands.INPUT_TIME:
+//                messageSender.sendMessage(getSendMessage(message, sessionService.selectSession(message)));
+//                break;
             case Commands.DELETE_CLIENT:
                 messageSender.sendMessage(userService.askOrDeleteUser(message));
                 break;
@@ -93,7 +93,7 @@ public class SendMessageService {
         return command;
     }
 
-    private SendMessage getSendMessage(Message message, String text) {
+    public SendMessage getSendMessage(Message message, String text) {
         var sendMessage = new SendMessage();
         sendMessage.setChatId(String.valueOf(message.getChatId()));
         sendMessage.setText(text);
