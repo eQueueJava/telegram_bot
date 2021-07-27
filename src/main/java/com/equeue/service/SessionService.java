@@ -18,10 +18,12 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -105,7 +107,10 @@ public class SessionService {
         }
         String[] lines = messageTxt.split("\n");
         final long providerId = getProviderIdSaveSessions(lines[1]);
-        final String date = lines[3].trim();
+        String date = new SimpleDateFormat("dd.MM.yyyy").format(new Date());
+        if(lines.length > 2){
+            date = lines[3].trim();
+        }
         LocalDate dateFromString = TimeUtil.getDateFromString(date);
 
         if (providerRepository.findById(providerId) == null) {
