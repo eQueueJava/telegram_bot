@@ -34,7 +34,7 @@ public class ScheduleService {
         if (text.replace(Commands.CREATE_SCHEDULE, "").isBlank()) {
             return "Введите данные в виде:\n" +
                     Commands.CREATE_SCHEDULE + "\n" +
-                    "provider: 1\n" +
+                    "provider: BarberShop\n" +
                     "dayOfWeek: 1\n" +
                     "workStart: 9:00\n" +
                     "workFinish: 18:00\n" +
@@ -44,7 +44,7 @@ public class ScheduleService {
         String[] lines = text.split("\n");
         Schedule schedule = new Schedule();
         schedule
-                .setProvider(providerRepository.findById(Long.valueOf(lines[1].replace("provider:", "").trim())))
+                .setProvider(providerRepository.findByName(lines[1].replace("provider:", "").trim()))
                 .setDayOfWeek(Integer.valueOf(lines[2].replace("dayOfWeek:", "").trim()))
                 .setWorkStart(TimeUtil.getUtcTimeFromTimeAndZone(
                         TimeUtil.getTimeFromString(lines[3].replace("workStart:", "").trim()),

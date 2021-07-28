@@ -66,10 +66,9 @@ public class Provider {
 
     @Override
     public String toString() {
-        String idText = "ID услуги - " + id + " \n";
         String nameText = "Название услуги - '" + name + "' \n";
-        String clientText = "Владелиц - " + client.getName() + "' (ID владельца - " + client.getId() + ")" + " \n";
-        String result = idText + nameText + clientText;
+        String clientText = "Владелец - " + client.getName() + "\n";
+        String result = nameText + clientText;
         if(scheduleMap.size() != 0){
             String scheduleText = "График работы : \n" + scheduleMap.values().stream()
                         .map(s -> DayOfWeek.of(s.getDayOfWeek()) + ":\t" +

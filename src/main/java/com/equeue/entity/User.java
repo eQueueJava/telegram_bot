@@ -109,27 +109,25 @@ public class User {
 
     @Override
     public String toString() {
-        String idText = "Ваш ID - " + id + " \n";
         String nameText = "Ваше имя - '" + name + "' \n";
         String userRoleText = "Вы зарегистрированы как - '" + userRole + "' \n";
         String timeZone = "Ваш часовой пояс - " + zoneId + " \n";
 
-        String result = idText + nameText + userRoleText + timeZone;
+        String result = nameText + userRoleText + timeZone;
 
         if (!providers.isEmpty()) {
             result += "Ваши заведения : " + providers.stream()
-                    .map(p -> "'" + p.getName() + "' ( Id заведения - " + p.getId() + ")")
+                    .map(p -> "'" + p.getName() + "'")
                     .collect(Collectors.joining(", \n\t")) + ", \n";
         }
 
         if (!sessions.isEmpty()) {
-            result += "К вам записаны : " + sessions.stream()
+            result += "Вы записаны : " + sessions.stream()
                     .map(s -> s.getProvider().getName() + ": " +
                             TimeUtil.getStringFromDateTime(s.getSessionStart())
                     )
                     .collect(Collectors.joining(" \n\t"));
         }
-
         return result;
     }
 }

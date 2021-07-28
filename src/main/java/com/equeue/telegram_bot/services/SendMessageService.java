@@ -1,9 +1,6 @@
 package com.equeue.telegram_bot.services;
 
-import com.equeue.service.ProviderService;
-import com.equeue.service.ScheduleService;
-import com.equeue.service.SessionService;
-import com.equeue.service.UserService;
+import com.equeue.service.*;
 import com.equeue.telegram_bot.Commands;
 import com.equeue.telegram_bot.messagesender.MessageSender;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +10,6 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 
 @Service
 public class SendMessageService {
-
-    public static final String PARAM_DIVIDER = "__";
-
     @Autowired
     private MessageSender messageSender;
     @Autowired
@@ -56,14 +50,11 @@ public class SendMessageService {
                 messageSender.sendMessage(getSendMessage(message, userService.findById(message)));
                 break;
             case Commands.READ_PROVIDER:
-                messageSender.sendMessage(getSendMessage(message, providerService.findById(message)));
+                messageSender.sendMessage(getSendMessage(message, providerService.findByName(message)));
                 break;
             case Commands.SET_FREE_TIME:
                 messageSender.sendMessage(sessionService.saveSession(message));
                 break;
-//            case Commands.INPUT_TIME:
-//                messageSender.sendMessage(getSendMessage(message, sessionService.selectSession(message)));
-//                break;
             case Commands.DELETE_CLIENT:
                 messageSender.sendMessage(userService.askOrDeleteUser(message));
                 break;
@@ -86,8 +77,8 @@ public class SendMessageService {
             command = messageText;
         }
 
-        if (command.lastIndexOf(PARAM_DIVIDER) > -1) {
-            String[] s = command.split(PARAM_DIVIDER);
+        if (command.lastIndexOf(HelperService.PARAM_DIVIDER) > -1) {
+            String[] s = command.split(HelperService.PARAM_DIVIDER);
             command = s[0];
         }
         return command;
@@ -110,5 +101,4 @@ public class SendMessageService {
     public void sendTextTo(String messageTest, Long telegramId) {
         messageSender.sendTextTo(messageTest, telegramId);
     }
-
 }

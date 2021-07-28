@@ -100,13 +100,13 @@ public class SessionService {
         if (messageTxt.replace(Commands.SET_FREE_TIME, "").isBlank()) {
             return sendMessageService.getSendMessage(message, "Введите данные в виде:\n" +
                     Commands.SET_FREE_TIME + "\n" +
-                    "provider Id: 1\n" +
+                    "provider: BarberShop\n" +
                     "date:\n" +
                     "12.07.2021");
 
         }
         String[] lines = messageTxt.split("\n");
-        final long providerId = getProviderIdSaveSessions(lines[1]);
+        final long providerId = providerRepository.findByName(getProviderNameSaveSessions(lines[1])).getId();
         String date = new SimpleDateFormat("dd.MM.yyyy").format(new Date());
         if(lines.length > 2){
             date = lines[3].trim();
@@ -196,9 +196,9 @@ public class SessionService {
         }
     }
 
-    private long getProviderIdSaveSessions(String line) {
+    private String getProviderNameSaveSessions(String line) {
         String[] rowTwo = line.split(" ");
-        return Long.parseLong(rowTwo[2].trim());
+        return rowTwo[2].trim();
     }
 
     private long getIdFromSelectSession(String[] lines, int i, String s, int i2) {

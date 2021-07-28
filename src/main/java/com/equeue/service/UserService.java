@@ -103,12 +103,12 @@ public class UserService {
         if (messageText.replace(Commands.READ_CLIENT, "").isBlank()) {
             return "Введите данные в виде:\n" +
                     Commands.READ_CLIENT + "\n" +
-                    "clientId: 1";
+                    "clientName: Donald Trump";
         }
 
         String[] lines = messageText.split("\n");
-        Long userId = Long.valueOf(lines[1].replace("clientId:", "").trim());
-        return userRepository.findById(userId).toString();
+        String userName = lines[1].replace("clientName:", "").trim();
+        return userRepository.findByName(userName).toString();
     }
 
     private User findByName(String name) {
@@ -243,6 +243,6 @@ public class UserService {
         } catch (Exception e) {
             return "FAIL";
         }
-        return "OK";
+        return "Ваш часовой пояс - " + zone;
     }
 }
