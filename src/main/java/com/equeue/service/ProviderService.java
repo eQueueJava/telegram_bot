@@ -45,11 +45,25 @@ public class ProviderService {
         }
 
         String[] lines = messageText.split("\n");
+        String name = lines[1].replace("name:", "").trim();
+        if(isName(name)){
+            return "Такое имя уже занято!";
+        }
         Provider provider = new Provider()
                 .setClient(user)
-                .setName(lines[1].replace("name:", "").trim());
+                .setName(name);
         save(provider);
         return provider.toString();
+    }
+
+    private boolean isName(String name) {
+        List<Provider> allProviders = providerRepository.findAll();
+        for (Provider provider: allProviders) {
+            if(provider.getName().equals(name)){
+                return true;
+            }
+        }
+        return false;
     }
 
     public String findByName(Message message) {

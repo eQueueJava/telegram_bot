@@ -198,7 +198,7 @@ public class SessionService {
 
     private String getProviderNameSaveSessions(String line) {
         String[] rowTwo = line.split(" ");
-        return rowTwo[2].trim();
+        return rowTwo[1].trim();
     }
 
     private long getIdFromSelectSession(String[] lines, int i, String s, int i2) {
