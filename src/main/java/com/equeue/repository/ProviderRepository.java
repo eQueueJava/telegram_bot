@@ -17,4 +17,6 @@ public interface ProviderRepository {
     Map<Long, Provider> findAllByUser(User user);
 
     List<Provider> deleteAllProvidersForUser(User user);
+
+    Provider findByName(String name);
 }

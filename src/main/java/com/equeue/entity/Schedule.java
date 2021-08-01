@@ -74,7 +74,7 @@ public class Schedule {
 
     @Override
     public String toString() {
-        String providerText = "Расписание для - " + provider.getName() + " (ID услуги - " + provider.getId() + ")\n";
+        String providerText = "Расписание для - " + provider.getName() + "\n";
         String dayOfWeekText = "День недели - " + DayOfWeek.of(dayOfWeek) + "\n";
         String workStartText = "Начало работы - " + TimeUtil.getStringFromTime(
                         TimeUtil.getTimeFromUtcTimeForZone(workStart, provider.getClient().getZoneId())) + "\n";

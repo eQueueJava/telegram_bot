@@ -62,4 +62,14 @@ public class ProviderRepositoryImpl implements ProviderRepository {
         }
         return providers;
     }
+
+    @Override
+    public Provider findByName(String name) {
+        for (Map.Entry<Long, Provider> entry: PROVIDER_MAP.entrySet()) {
+            if(entry.getValue().getName().equals(name)){
+                return entry.getValue();
+            }
+        }
+        return new Provider();
+    }
 }
