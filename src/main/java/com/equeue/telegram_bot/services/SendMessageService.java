@@ -50,7 +50,7 @@ public class SendMessageService {
                 messageSender.sendMessage(getSendMessage(message, userService.findById(message)));
                 break;
             case Commands.READ_PROVIDER:
-                messageSender.sendMessage(getSendMessage(message, providerService.findByName(message)));
+                messageSender.sendMessage(getSendMessage(message, providerService.findForUserByName(message)));
                 break;
             case Commands.SET_FREE_TIME:
                 messageSender.sendMessage(sessionService.saveSession(message));

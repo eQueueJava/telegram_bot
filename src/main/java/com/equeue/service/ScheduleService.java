@@ -1,6 +1,8 @@
 package com.equeue.service;
 
+import com.equeue.entity.Provider;
 import com.equeue.entity.Schedule;
+import com.equeue.entity.User;
 import com.equeue.repository.ProviderRepository;
 import com.equeue.repository.ScheduleRepository;
 import com.equeue.repository.UserRepository;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ScheduleService {
@@ -30,8 +33,8 @@ public class ScheduleService {
     }
 
     public String save(Message message) {
-        String text = message.getText();
-        if (text.replace(Commands.CREATE_SCHEDULE, "").isBlank()) {
+        Map<String, String> request = HelperService.parseRequest(message.getText());
+        if (request.size() == 1) {
             return "Введите данные в виде:\n" +
                     Commands.CREATE_SCHEDULE + "\n" +
                     "provider: BarberShop\n" +
@@ -40,21 +43,29 @@ public class ScheduleService {
                     "workFinish: 18:00\n" +
                     "duration: 30";
         }
-
-        String[] lines = text.split("\n");
+        Provider provider;
+        User user = userRepository.findByTelegramId(message.getChatId());
+        if(user.getProviders().isEmpty()){
+            return "У вас нету предоставителя услуг!";
+        } else if (user.getProviders().size() == 1){
+            provider = user.getProviders().get(0);
+        }else if (user.getProviders().size() > 1 && !request.containsKey("provider")){
+            return "Укажите (provider:)!";
+        }else{
+            provider = providerRepository.findByName(request.get("provider"));
+        }
         Schedule schedule = new Schedule();
         schedule
-                .setProvider(providerRepository.findByName(lines[1].replace("provider:", "").trim()))
-                .setDayOfWeek(Integer.valueOf(lines[2].replace("dayOfWeek:", "").trim()))
+                .setProvider(provider)
+                .setDayOfWeek(Integer.valueOf((request.get("dayOfWeek").trim())))
                 .setWorkStart(TimeUtil.getUtcTimeFromTimeAndZone(
-                        TimeUtil.getTimeFromString(lines[3].replace("workStart:", "").trim()),
+                        TimeUtil.getTimeFromString((request.get("workStart").trim())),
                         userRepository.findByTelegramId(message.getFrom().getId()).getZoneId()))
                 .setWorkFinish(TimeUtil.getUtcTimeFromTimeAndZone(
-                        TimeUtil.getTimeFromString(lines[4].replace("workFinish:", "").trim()),
+                        TimeUtil.getTimeFromString((request.get("workFinish").trim())),
                         userRepository.findByTelegramId(message.getFrom().getId()).getZoneId()))
-                .setDuration(Integer.valueOf(lines[5].replace("duration:", "").trim()));
+                .setDuration(Integer.valueOf((request.get("duration").trim())));
         save(schedule);
         return schedule.toString();
     }
-
 }

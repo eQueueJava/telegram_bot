@@ -25,6 +25,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class SessionService {
@@ -95,21 +96,53 @@ public class SessionService {
     }
 
     public SendMessage saveSession(Message message) {
-        String messageTxt = message.getText();
+        Map<String, String> request = HelperService.parseRequest(message.getText());
 
-        if (messageTxt.replace(Commands.SET_FREE_TIME, "").isBlank()) {
+        if (request.size() == 1) {
             return sendMessageService.getSendMessage(message, "Введите данные в виде:\n" +
                     Commands.SET_FREE_TIME + "\n" +
+                    "userName: Donald Trump\n" +
                     "provider: BarberShop\n" +
-                    "date:\n" +
-                    "12.07.2021");
+                    "date: 12.07.2021");
 
         }
-        String[] lines = messageTxt.split("\n");
-        final long providerId = providerRepository.findByName(getProviderNameSaveSessions(lines[1])).getId();
+        if(!request.containsKey("userName")){
+            SendMessage result = new SendMessage();
+            result.setText("Укажите userName!");
+            result.setChatId(String.valueOf(message.getChatId()));
+            return result;
+        }
+        User user = userRepository.findByName(request.get("userName"));
+        Provider myProvider = new Provider();
+
+        if(user.getProviders().isEmpty()){
+            SendMessage result = new SendMessage();
+            result.setText("Этот пользователь не предоставляет услуги!");
+            result.setChatId(String.valueOf(message.getChatId()));
+            return result;
+        }
+
+        if(user.getProviders().size() == 1){
+            myProvider = user.getProviders().get(0);
+        }
+
+        for (Provider provider: user.getProviders()) {
+            if(provider.getName().equals(request.get("provider"))){
+                myProvider = provider;
+            }
+        }
+
+        if(myProvider.getId() == null){
+            SendMessage result = new SendMessage();
+            result.setText("У этого пользователя нету услуги с таким именем!");
+            result.setChatId(String.valueOf(message.getChatId()));
+            return result;
+        }
+
+        final long providerId = myProvider.getId();
         String date = new SimpleDateFormat("dd.MM.yyyy").format(new Date());
-        if(lines.length > 2){
-            date = lines[3].trim();
+        if(request.containsKey("date")){
+            date = request.get("date");
         }
         LocalDate dateFromString = TimeUtil.getDateFromString(date);
 

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ProviderService {
@@ -46,8 +47,8 @@ public class ProviderService {
 
         String[] lines = messageText.split("\n");
         String name = lines[1].replace("name:", "").trim();
-        if(isName(name)){
-            return "Такое имя уже занято!";
+        if(isName(name, user)){
+            return "Вы уже зарегистрировали заведение с таким именем!";
         }
         Provider provider = new Provider()
                 .setClient(user)
@@ -56,25 +57,43 @@ public class ProviderService {
         return provider.toString();
     }
 
-    private boolean isName(String name) {
-        List<Provider> allProviders = providerRepository.findAll();
-        for (Provider provider: allProviders) {
-            if(provider.getName().equals(name)){
+    private boolean isName(String name, User user) {
+        Map<Long, Provider> allProvidersForUser = providerRepository.findAllByUser(user);
+        for (Map.Entry<Long, Provider> entry: allProvidersForUser.entrySet()) {
+            if(entry.getValue().getName().equals(name)){
                 return true;
             }
         }
         return false;
     }
 
-    public String findByName(Message message) {
-        String messageText = message.getText();
-        if (messageText.replace(Commands.READ_PROVIDER, "").isBlank()) {
+    public String findForUserByName(Message message) {
+        Map<String, String> request = HelperService.parseRequest(message.getText());
+        if (request.size() == 1) {
             return "Введите данные в виде:\n" +
                     Commands.READ_PROVIDER + "\n" +
+                    "userName: Donald Trump\n" +
                     "providerName: BarberShop";
         }
+        User user = userRepository.findByName(request.get("userName"));
 
-        String[] lines = messageText.split("\n");
-        return providerRepository.findByName(lines[1].replace("providerName:", "").trim()).toString();
+        if(!request.containsKey("providerName")){
+            if(user.getProviders().isEmpty()){
+                return "У этого пользователя нету представителей услуг!";
+            }
+
+            if(user.getProviders().size() == 1){
+                return user.getProviders().get(0).toString();
+            }
+
+            return "Укажите providerName!";
+        }
+
+        for (Provider provider: user.getProviders()) {
+            if(provider.getName().equals(request.get("providerName"))){
+                return provider.toString();
+            }
+        }
+        return "У вас нету услуги с таким именем!";
     }
 }
