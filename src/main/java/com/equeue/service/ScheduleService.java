@@ -55,8 +55,7 @@ public class ScheduleService {
             provider = providerRepository.findByName(request.get("provider"));
         }
         Schedule schedule = new Schedule();
-        schedule
-                .setProvider(provider)
+        schedule.setProvider(provider)
                 .setDayOfWeek(Integer.valueOf((request.get("dayOfWeek").trim())))
                 .setWorkStart(TimeUtil.getUtcTimeFromTimeAndZone(
                         TimeUtil.getTimeFromString((request.get("workStart").trim())),

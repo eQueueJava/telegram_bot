@@ -121,7 +121,7 @@ public class UserService {
     }
 
     public void registerGuestUserIfNotExist(Message message) {
-        Long tgId = message.getFrom().getId();
+        Long tgId = message.getChatId();
         if (userRepository.findByTelegramId(tgId) == null) {
             String tgUsername = message.getFrom().getUserName();
             userRepository.save(new User()

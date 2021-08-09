@@ -14,6 +14,9 @@ public class Schedule {
     private LocalTime workFinish;
     private Integer duration;
 
+    public Schedule() {
+    }
+
     public Provider getProvider() {
         return provider;
     }
