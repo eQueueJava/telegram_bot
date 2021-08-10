@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
+import java.util.Map;
+
 @Service
 public class SendMessageService {
     @Autowired
@@ -64,24 +66,8 @@ public class SendMessageService {
     }
 
     private String getCommand(String messageText) {
-        String command;
-        if (messageText.indexOf(' ') > 0) {
-            if (messageText.indexOf('\n') > 0 && messageText.indexOf('\n') < messageText.indexOf(' ')) {
-                command = messageText.substring(0, messageText.indexOf('\n'));
-            } else {
-                command = messageText.substring(0, messageText.indexOf(' '));
-            }
-        } else if (messageText.indexOf('\n') > 0) {
-            command = messageText.substring(0, messageText.indexOf('\n'));
-        } else {
-            command = messageText;
-        }
-
-        if (command.lastIndexOf(HelperService.PARAM_DIVIDER) > -1) {
-            String[] s = command.split(HelperService.PARAM_DIVIDER);
-            command = s[0];
-        }
-        return command;
+        Map<String, String> parseRequest = HelperService.parseRequest(messageText);
+        return parseRequest.get("command");
     }
 
     public SendMessage getSendMessage(Message message, String text) {

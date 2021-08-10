@@ -104,7 +104,6 @@ public class SessionService {
                     "userName: Donald Trump\n" +
                     "provider: BarberShop\n" +
                     "date: 12.07.2021");
-
         }
         if(!request.containsKey("userName")){
             SendMessage result = new SendMessage();
@@ -220,23 +219,4 @@ public class SessionService {
         }
         return generatedSessions;
     }
-
-    private void addGeneratedSessions(List<Session> sessions, LocalDate date) {
-        for (Session session : sessions) {
-            session.setSessionStart(session.getSessionStart().with(date));
-            session.setSessionFinish(session.getSessionFinish().with(date));
-            sessionRepository.save(session);
-        }
-    }
-
-    private String getProviderNameSaveSessions(String line) {
-        String[] rowTwo = line.split(" ");
-        return rowTwo[1].trim();
-    }
-
-    private long getIdFromSelectSession(String[] lines, int i, String s, int i2) {
-        String[] line3 = lines[i].split(s);
-        return Long.parseLong(line3[i2].trim());
-    }
-
 }
